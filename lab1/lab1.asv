@@ -21,9 +21,9 @@ I=imread('Data/0005_s.png'); % we have to be in the proper folder
 % R is a rotation matrix (orthogonal matrix) and t is a translation vector.
 
 scalingFactor = 1;
-rotationAngle = 45 / 360 * 2 * pi;
-translationX = 0;
-translationY = 0;
+rotationAngle = 360 / 360 * 2 * pi;
+translationX = 100;
+translationY = 200;
 
 H=[ scalingFactor * cos(rotationAngle)   scalingFactor * -sin(rotationAngle)    translationX;
     scalingFactor * sin(rotationAngle)   scalingFactor *  cos(rotationAngle)    translationY;
@@ -143,8 +143,8 @@ l4c = [l4(1) / l4(3), l4(2) / l4(3)]';
 % Angles of lines before transformation:
 ang_l1_l2_before = acos((l1c'*l2c)/sqrt((l1c'*l1c)*(l2c'*l2c)));
 ang_l3_l4_before = acos((l3c'*l4c)/sqrt((l3c'*l3c)*(l4c'*l4c)));
-fprintf('Angle of l1 and l2 before transformation = %f º\n', ang_l1_l2_before)
-fprintf('Angle of l3 and l4 before transformation = %f º\n', ang_l3_l4_before)
+fprintf('Angle of l1 and l2 before transformation (º) = \n', ang_l1_l2_before)
+fprintf('Angle of l3 and l4 before transformation (º) = \n', ang_l3_l4_before)
 
 % Lines after transformation in cartesian coordinates:
 l1rc = [lr1(1) / lr1(3), lr1(2) / lr1(3)]';
@@ -154,9 +154,9 @@ l4rc = [lr4(1) / lr4(3), lr4(2) / lr4(3)]';
 
 % Angles of lines after transformation:
 ang_l1_l2_after = acos((lr1c'*lr2c)/sqrt((lr1c'*lr1c)*(lr2c'*lr2c)));
-ang_l3_l4_after = acos((lr3c'*lr4c)/sqrt((lr3c'*lr3c)*(lr4c'*lr4c)));
-fprintf('Angle of l1 and l2 after transformation = %f º\n', ang_l1_l2_after)
-fprintf('Angle of l3 and l4 after transformation = %f º\n', ang_l3_l4_after)
+ang_l1_l2_after = acos((lr1c'*lr2c)/sqrt((lr1c'*lr3c)*(lr4c'*lr4c)));
+fprintf('Angle of l1 and l2 after transformation (º) = \n', ang_l1_l2_after)
+fprintf('Angle of l1 and l2 after transformation (º) = \n', ang_l3_l4_after)
 
 
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
