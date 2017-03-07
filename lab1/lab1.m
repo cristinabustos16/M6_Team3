@@ -59,39 +59,41 @@ figure; imshow(I); figure; imshow(uint8(I2));
 % figure; imshow(I); figure; imshow(uint8(I2));
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% %% 2. Affine Rectification
-% 
-% 
-% % choose the image points
-% I=imread('Data/0000_s.png');
-% A = load('Data/0000_s_info_lines.txt');
-% 
-% % indices of lines
-% i = 424;
-% p1 = [A(i,1) A(i,2) 1]';
-% p2 = [A(i,3) A(i,4) 1]';
-% i = 240;
-% p3 = [A(i,1) A(i,2) 1]';
-% p4 = [A(i,3) A(i,4) 1]';
-% i = 712;
-% p5 = [A(i,1) A(i,2) 1]';
-% p6 = [A(i,3) A(i,4) 1]';
-% i = 565;
-% p7 = [A(i,1) A(i,2) 1]';
-% p8 = [A(i,3) A(i,4) 1]';
-% 
-% % ToDo: compute the lines l1, l2, l3, l4, that pass through the different pairs of points
-% 
-% 
-% % show the chosen lines in the image
-% figure;imshow(I);
-% hold on;
-% t=1:0.1:1000;
-% plot(t, -(l1(1)*t + l1(3)) / l1(2), 'y');
-% plot(t, -(l2(1)*t + l2(3)) / l2(2), 'y');
-% plot(t, -(l3(1)*t + l3(3)) / l3(2), 'y');
-% plot(t, -(l4(1)*t + l4(3)) / l4(2), 'y');
-% 
+%% 2. Affine Rectification
+
+
+% choose the image points
+I=imread('Data/0000_s.png');
+A = load('Data/0000_s_info_lines.txt');
+
+% indices of lines
+i = 424;
+p1 = [A(i,1) A(i,2) 1]';
+p2 = [A(i,3) A(i,4) 1]';
+i = 240;
+p3 = [A(i,1) A(i,2) 1]';
+p4 = [A(i,3) A(i,4) 1]';
+i = 712;
+p5 = [A(i,1) A(i,2) 1]';
+p6 = [A(i,3) A(i,4) 1]';
+i = 565;
+p7 = [A(i,1) A(i,2) 1]';
+p8 = [A(i,3) A(i,4) 1]';
+
+% ToDo: compute the lines l1, l2, l3, l4, that pass through the different pairs of points
+l1 = cross(p1,p2);
+l2 = cross(p3,p4);
+l3 = cross(p5,p6);
+l4 = cross(p7,p8);
+% show the chosen lines in the image
+figure;imshow(I);
+hold on;
+t=1:0.1:1000;
+plot(t, -(l1(1)*t + l1(3)) / l1(2), 'y');
+plot(t, -(l2(1)*t + l2(3)) / l2(2), 'y');
+plot(t, -(l3(1)*t + l3(3)) / l3(2), 'y');
+plot(t, -(l4(1)*t + l4(3)) / l4(2), 'y');
+
 % % ToDo: compute the homography that affinely rectifies the image
 % 
 % I2 = apply_H(I, H);
