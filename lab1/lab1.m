@@ -74,7 +74,7 @@ translationTransform = [1 0 translationX;
 
 HDecomposed = translationTransform * (RThetaTransform * RPhiTransform' * scaleTransform * RPhiTransform);
 error_threshold = 1e-10;
-if sum(sum(abs(H-HDecomposed))) < error_threshold
+if sum(sum(round(H * 100) / 100 - round(HDecomposed * 100) / 100)) == 0
     fprintf('yeah! the product of the four previous transformations produces the same matrix H as above');
 else
     fprintf('ohhhh! the product of the four previous transformations does not produce the same matrix H as above');
