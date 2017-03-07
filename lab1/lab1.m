@@ -16,21 +16,21 @@ I=imread('Data/0005_s.png'); % we have to be in the proper folder
 
 % % ToDo: generate a matrix H which produces a similarity transformation
 
-% % Similarity transformation: let x and x??? be homogeneous coordinates. 
-% % x' = H_s x, where H_s = (sR, t; 0^T, 1): s is an isotropic scaling factor, 
-% % R is a rotation matrix (orthogonal matrix) and t is a translation vector.
+% Similarity transformation: let x and x??? be homogeneous coordinates. 
+% x' = H_s x, where H_s = (sR, t; 0^T, 1): s is an isotropic scaling factor, 
+% R is a rotation matrix (orthogonal matrix) and t is a translation vector.
 
-% scalingFactor = 1;
-% rotationAngle = 45 / 360 * 2 * pi;
-% translationX = 0;
-% translationY = 0;
+scalingFactor = 1;
+rotationAngle = 45 / 360 * 2 * pi;
+translationX = 0;
+translationY = 0;
 
-% H=[ scalingFactor * cos(rotationAngle)   scalingFactor * -sin(rotationAngle)    translationX;
-%     scalingFactor * sin(rotationAngle)   scalingFactor *  cos(rotationAngle)    translationY;
-%     0                                    0                                      1];
+H=[ scalingFactor * cos(rotationAngle)   scalingFactor * -sin(rotationAngle)    translationX;
+    scalingFactor * sin(rotationAngle)   scalingFactor *  cos(rotationAngle)    translationY;
+    0                                    0                                      1];
 
-% I2 = apply_H(I, H);
-% figure; imshow(I); figure; imshow(uint8(I2));
+I2 = apply_H(I, H);
+figure; imshow(I); figure; imshow(uint8(I2));
 
 
 %% 1.2. Affinities
@@ -142,7 +142,7 @@ v2 = cross(l3, l4);
 % compute the line at infinity
 l = cross(v1, v2);
 % normalize line at infinity
-l = l / max (l);
+l = l / norm(l);
 
 % compute H based on the line at infinity, lecture2 slide 12
 H = [1 0 0; 0 1 0; l'];
