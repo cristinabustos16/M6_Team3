@@ -147,7 +147,9 @@ l = l / norm(l);
 % compute H based on the line at infinity, lecture2 slide 12
 H = [1 0 0; 0 1 0; l'];
 
-I2 = apply_H(I, H);
+
+I2 = apply_H(permute(I,[2 1 3]), H);
+I2 = permute(I2,[2 1 3]);
 figure; imshow(uint8(I2));
 
 % ToDo: compute the transformed lines lr1, lr2, lr3, lr4
