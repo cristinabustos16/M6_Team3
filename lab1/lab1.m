@@ -46,7 +46,7 @@ H = [ A(1,1)   A(1,2)    translationX;
       A(2,1)   A(2,2)    translationY;
       0        0         1];
 I2 = apply_H(I, H);
-% figure; imshow(I); figure; imshow(uint8(I2));
+figure; imshow(I); figure; imshow(uint8(I2));
 
 % ToDo: decompose the affinity in four transformations: two
 % rotations, a scale, and a translation
@@ -72,8 +72,9 @@ translationTransform = [1 0 translationX;
 % ToDo: verify that the product of the four previous transformations
 % produces the same matrix H as above
 
-HDecomposed = translationTransform * (RThetaTransform * RPhiTransform' * scaleTransform * RPhiTransform)
-if sum(sum(H-HDecomposed)) == 0
+HDecomposed = translationTransform * (RThetaTransform * RPhiTransform' * scaleTransform * RPhiTransform);
+error_threshold = 1e-10;
+if sum(sum(abs(H-HDecomposed))) < error_threshold
     fprintf('yeah! the product of the four previous transformations produces the same matrix H as above');
 else
     fprintf('ohhhh! the product of the four previous transformations does not produce the same matrix H as above');
@@ -81,7 +82,7 @@ end
 
 % ToDo: verify that the proper sequence of the four previous
 % transformations over the image I produces the same image I2 as before
-
+ 
 I2Decomposed = apply_H(I, HDecomposed);
 fig = figure(2);
 subplot(1,3,1); imshow(I); title('original');
