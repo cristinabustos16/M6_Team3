@@ -14,7 +14,7 @@
 %% 1.1. Similarities
 I=imread('Data/0005_s.png'); % we have to be in the proper folder
 
-% % ToDo: generate a matrix H which produces a similarity transformation
+% ToDo: generate a matrix H which produces a similarity transformation
 
 % Similarity transformation: let x and x??? be homogeneous coordinates. 
 % x' = H_s x, where H_s = (sR, t; 0^T, 1): s is an isotropic scaling factor, 
@@ -90,14 +90,35 @@ subplot(1,3,2); imshow(I2); title('Affine transformation with H');
 subplot(1,3,3); imshow(I2Decomposed); title('Affine transformation with H decomposed');
 
 
-% %% 1.3 Projective transformations (homographies)
-% 
-% % ToDo: generate a matrix H which produces a projective transformation
-% 
-% I2 = apply_H(I, H);
-% figure; imshow(I); figure; imshow(uint8(I2));
+%% 1.3 Projective transformations (homographies)
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% ToDo: generate a matrix H which produces a projective transformation
+
+A = [0.6 0.1;
+     0.3 0.4];
+translationX = 2;
+translationY = 3;
+v1 = 0.0001;
+v2 = 0.0002;
+v = 1;
+
+H = [A(1,1)   A(1,2)    translationX;
+     A(2,1)   A(2,2)    translationY;
+     v1       v2        v];
+I2 = apply_H(I, H);
+
+v = -1;
+H = [A(1,1)   A(1,2)    translationX;
+     A(2,1)   A(2,2)    translationY;
+     v1       v2        v];
+I3 = apply_H(I, H);
+
+fig = figure(3);
+subplot(1,3,1); imshow(I); title('Original image');
+subplot(1,3,2); imshow(I2); title('Projective transformation');
+subplot(1,3,3); imshow(I3); title('Projective transformation mirrored');
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% 2. Affine Rectification
 
 % choose the image points
