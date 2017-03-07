@@ -59,34 +59,93 @@ plot(y1r, x1r, '*r', 'LineWidth', 3)
 plot(y2r, x2r, '*b', 'LineWidth', 3)
 
 
-% %% 1.2. Affinities
-% 
-% % ToDo: generate a matrix H which produces an affine transformation
-% 
-% I2 = apply_H(I, H);
-% figure; imshow(I); figure; imshow(uint8(I2));
-% 
-% % ToDo: decompose the affinity in four transformations: two
-% % rotations, a scale, and a translation
-% 
-% % ToDo: verify that the product of the four previous transformations
-% % produces the same matrix H as above
-% 
-% % ToDo: verify that the proper sequence of the four previous
-% % transformations over the image I produces the same image I2 as before
-% 
-% 
-% 
-% %% 1.3 Projective transformations (homographies)
-% 
-% % ToDo: generate a matrix H which produces a projective transformation
-% 
-% I2 = apply_H(I, H);
-% figure; imshow(I); figure; imshow(uint8(I2));
+%% 1.2. Affinities
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% ToDo: generate a matrix H which produces an affine transformation
+
+A = [ 1 0.3;
+     -1 0.6];
+translationX = 2;
+translationY = 3;
+
+H = [ A(1,1)   A(1,2)    translationX;
+      A(2,1)   A(2,2)    translationY;
+      0        0         1];
+I2 = apply_H(I, H);
+figure; imshow(I); figure; imshow(uint8(I2));
+
+% ToDo: decompose the affinity in four transformations: two
+% rotations, a scale, and a translation
+
+[U,D,V] = svd(A);
+RTheta = U*V';  % U --> buen resultado visual
+RThetaTransform = [RTheta(1,1) RTheta(1,2) 0;
+                   RTheta(2,1) RTheta(2,2) 0; 
+                   0           0           1];
+RPhi = V';
+RPhiTransform = [RPhi(1,1) RPhi(1,2) 0;
+                 RPhi(2,1) RPhi(2,2) 0; 
+                 0         0         1];
+lambda1 = D(1,1);
+lambda2 = D(2,2);
+scaleTransform = [lambda1 0       0;
+                  0       lambda2 0;
+                  0       0       1];
+translationTransform = [1 0 translationX;
+                        0 1 translationY;
+                        0 0 1];
+ 
+% ToDo: verify that the product of the four previous transformations
+% produces the same matrix H as above
+
+HDecomposed = translationTransform * (RThetaTransform * RPhiTransform' * scaleTransform * RPhiTransform);
+error_threshold = 1e-10;
+if sum(sum(round(H * 100) / 100 - round(HDecomposed * 100) / 100)) == 0
+    fprintf('yeah! the product of the four previous transformations produces the same matrix H as above');
+else
+    fprintf('ohhhh! the product of the four previous transformations does not produce the same matrix H as above');
+end
+
+% ToDo: verify that the proper sequence of the four previous
+% transformations over the image I produces the same image I2 as before
+ 
+I2Decomposed = apply_H(I, HDecomposed);
+fig = figure(2);
+subplot(1,3,1); imshow(I); title('Original image');
+subplot(1,3,2); imshow(I2); title('Affine transformation with H');
+subplot(1,3,3); imshow(I2Decomposed); title('Affine transformation with H decomposed');
+
+
+%% 1.3 Projective transformations (homographies)
+
+% ToDo: generate a matrix H which produces a projective transformation
+
+A = [0.6 0.1;
+     0.3 0.4];
+translationX = 2;
+translationY = 3;
+v1 = 0.0001;
+v2 = 0.0002;
+v = 1;
+
+H = [A(1,1)   A(1,2)    translationX;
+     A(2,1)   A(2,2)    translationY;
+     v1       v2        v];
+I2 = apply_H(I, H);
+
+v = -1;
+H = [A(1,1)   A(1,2)    translationX;
+     A(2,1)   A(2,2)    translationY;
+     v1       v2        v];
+I3 = apply_H(I, H);
+
+fig = figure(3);
+subplot(1,3,1); imshow(I); title('Original image');
+subplot(1,3,2); imshow(I2); title('Projective transformation');
+subplot(1,3,3); imshow(I3); title('Projective transformation mirrored');
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% 2. Affine Rectification
-
 
 % choose the image points
 I=imread('Data/0000_s.png');
@@ -130,12 +189,13 @@ v2 = cross(l3, l4);
 % compute the line at infinity
 linf = cross(v1, v2);
 % normalize line at infinity
-linf = linf / max (linf);
+linf = linf / max(linf);
 
 % compute H based on the line at infinity, lecture2 slide 12
 H_p = [1 0 0; 0 1 0; linf'];
 
-I2 = apply_H(I, H_p);
+I2 = apply_H(permute(I,[2 1 3]), H);
+I2 = permute(I2,[2 1 3]);
 figure; imshow(uint8(I2));
 
 % ToDo: compute the transformed lines lr1, lr2, lr3, lr4
