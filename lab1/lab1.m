@@ -86,19 +86,31 @@ l2 = cross(p3,p4);
 l3 = cross(p5,p6);
 l4 = cross(p7,p8);
 % show the chosen lines in the image
-figure;imshow(I);
-hold on;
-t=1:0.1:1000;
-plot(t, -(l1(1)*t + l1(3)) / l1(2), 'y');
-plot(t, -(l2(1)*t + l2(3)) / l2(2), 'y');
-plot(t, -(l3(1)*t + l3(3)) / l3(2), 'y');
-plot(t, -(l4(1)*t + l4(3)) / l4(2), 'y');
+% figure;imshow(I);
+% hold on;
+% t=1:0.1:1000;
+% plot(t, -(l1(1)*t + l1(3)) / l1(2), 'y');
+% plot(t, -(l2(1)*t + l2(3)) / l2(2), 'y');
+% plot(t, -(l3(1)*t + l3(3)) / l3(2), 'y');
+% plot(t, -(l4(1)*t + l4(3)) / l4(2), 'y');
 
 % % ToDo: compute the homography that affinely rectifies the image
-% 
-% I2 = apply_H(I, H);
-% figure; imshow(uint8(I2));
-% 
+
+% compute the vanishing points, lecture 2 slide 16
+v1 = cross(l1, l2);
+v2 = cross(l3, l4);
+
+% compute the line at infinity
+l = cross(v1, v2);
+% normalize line at infinity
+l = l / max (l);
+
+% compute H based on the line at infinity, lecture2 slide 12
+H = [1 0 0; 0 1 0; l'];
+
+I2 = apply_H(I, H);
+figure; imshow(uint8(I2));
+
 % % ToDo: compute the transformed lines lr1, lr2, lr3, lr4
 % 
 % % show the transformed lines in the transformed image
