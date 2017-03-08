@@ -29,8 +29,6 @@ function [transformedImage] = apply_H(I, H)
         
     % 3. transformation of the pixels (backwards)
 
-%     transposedI = permute(I,[2 1 3]);  % source: http://stackoverflow.com/questions/29707563/image-transpose-in-matlab
-
     H_inv = inv(H);
 
     for row=1:size(transformedImage, 1)
@@ -40,9 +38,7 @@ function [transformedImage] = apply_H(I, H)
             pH = H_inv * p;  % homogeneous coordinates
             pC = [round(pH(1)/pH(3)) round(pH(2)/pH(3))];  % cartesian coordinates
             
-%             if  pC(2) > 0 && pC(1) > 0 && pC(2) <= size(transposedI,1) && pC(1) <= size(transposedI, 2)
             if  pC(2) > 0 && pC(1) > 0 && pC(1) <= size(I,1) && pC(2) <= size(I, 2)
-%                 transformedImage(row, col, :) = transposedI(pC(2), pC(1), :);
                 transformedImage(row, col, :) = I(pC(1), pC(2), :);
             end
         end
