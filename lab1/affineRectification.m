@@ -1,9 +1,3 @@
-% %% 2. Affine Rectification
-
-% I = imread('Data/0000_s.png');
-% A = load('Data/0000_s_info_lines.txt');
-% affineRectification(I, A, 424, 240, 712, 565);
-
 % The function "affineRectification" that gets as input an image I, the lines 
 % information, and the indices of the lines to use, and computes and shows an
 % affine srectification on the image.
@@ -89,10 +83,10 @@ function [transformedImage] = affineRectification(I, A, i1, i2, i3, i4)
     fprintf('Angle of l3 and l4 before transformation = %f ?\n', ang_l3_l4_before)
 
     % Lines after transformation in cartesian coordinates:
-    l1rc = [lr1(1) / lr1(3), lr1(2) / lr1(3)]';
-    l2rc = [lr2(1) / lr2(3), lr2(2) / lr2(3)]';
-    l3rc = [lr3(1) / lr3(3), lr3(2) / lr3(3)]';
-    l4rc = [lr4(1) / lr4(3), lr4(2) / lr4(3)]';
+    lr1c = [lr1(1) / lr1(3), lr1(2) / lr1(3)]';
+    lr2c = [lr2(1) / lr2(3), lr2(2) / lr2(3)]';
+    lr3c = [lr3(1) / lr3(3), lr3(2) / lr3(3)]';
+    lr4c = [lr4(1) / lr4(3), lr4(2) / lr4(3)]';
 
     % Angles of lines after transformation:
     ang_l1_l2_after = acos((lr1c'*lr2c)/sqrt((lr1c'*lr1c)*(lr2c'*lr2c)));

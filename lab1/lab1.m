@@ -193,12 +193,20 @@ compute_angle(l2_s, l4_s)
 % %% 4. OPTIONAL: Metric Rectification in a single step
 % % Use 5 pairs of orthogonal lines (pages 55-57, Hartley-Zisserman book)
 % 
-% %% 5. OPTIONAL: Affine Rectification of the left facade of image 0000
+
+%% 5. OPTIONAL: Affine Rectification of the left facade of image 0000
+I = imread('Data/0000_s.png');
+A = load('Data/0000_s_info_lines.txt');
+affineRectification(I, A, 493, 186, 48, 508);
+
+%% 6. OPTIONAL: Metric Rectification of the left facade of image 0000
 % 
-% %% 6. OPTIONAL: Metric Rectification of the left facade of image 0000
-% 
-% %% 7. OPTIONAL: Affine Rectification of the left facade of image 0001
-% 
-% %% 8. OPTIONAL: Metric Rectification of the left facade of image 0001
+
+%% 7. OPTIONAL: Affine Rectification of the left facade of image 0001
+I = imread('Data/0001_s.png');
+A = load('Data/0001_s_info_lines.txt');
+affineRectification(I, A, 614, 159, 645, 541);
+ 
+%% 8. OPTIONAL: Metric Rectification of the left facade of image 0001
 % 
 
