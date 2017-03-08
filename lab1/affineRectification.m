@@ -8,7 +8,7 @@
 % information, and the indices of the lines to use, and computes and shows an
 % affine srectification on the image.
 
-function [transformedImage] = affineRectification(I, A, i1, i2, i3, i4)
+function [I2, H_p] = affineRectification(I, A, i1, i2, i3, i4)
 
     % indices of lines
     p1 = [A(i1,1) A(i1,2) 1]';
@@ -47,18 +47,19 @@ function [transformedImage] = affineRectification(I, A, i1, i2, i3, i4)
     l = l / norm(l);
 
     % compute H based on the line at infinity, lecture2 slide 12
-    H = [1 0 0; 0 1 0; l'];
+    H_p = [1 0 0; 0 1 0; l'];
 
 
-    I2 = apply_H(permute(I,[2 1 3]), H);
+    I2 = apply_H(permute(I,[2 1 3]), H_p);
     I2 = permute(I2,[2 1 3]);
     figure; imshow(uint8(I2));
 
     % ToDo: compute the transformed lines lr1, lr2, lr3, lr4
 
     % Transpose of the inverse of H:
-    H_inv_tras = (inv(H))';
+    H_inv_tras = (inv(H_p))';
 
+    % Transform the lines:
     lr1 = H_inv_tras * l1;
     lr2 = H_inv_tras * l2;
     lr3 = H_inv_tras * l3;
@@ -76,27 +77,15 @@ function [transformedImage] = affineRectification(I, A, i1, i2, i3, i4)
     % ToDo: to evaluate the results, compute the angle between the different pair 
     % of lines before and after the image transformation
 
-    % Lines before transformation in cartesian coordinates:
-    l1c = [l1(1) / l1(3), l1(2) / l1(3)]';
-    l2c = [l2(1) / l2(3), l2(2) / l2(3)]';
-    l3c = [l3(1) / l3(3), l3(2) / l3(3)]';
-    l4c = [l4(1) / l4(3), l4(2) / l4(3)]';
-
     % Angles of lines before transformation:
-    ang_l1_l2_before = acos((l1c'*l2c)/sqrt((l1c'*l1c)*(l2c'*l2c)));
-    ang_l3_l4_before = acos((l3c'*l4c)/sqrt((l3c'*l3c)*(l4c'*l4c)));
-    fprintf('Angle of l1 and l2 before transformation = %f ?\n', ang_l1_l2_before)
-    fprintf('Angle of l3 and l4 before transformation = %f ?\n', ang_l3_l4_before)
-
-    % Lines after transformation in cartesian coordinates:
-    l1rc = [lr1(1) / lr1(3), lr1(2) / lr1(3)]';
-    l2rc = [lr2(1) / lr2(3), lr2(2) / lr2(3)]';
-    l3rc = [lr3(1) / lr3(3), lr3(2) / lr3(3)]';
-    l4rc = [lr4(1) / lr4(3), lr4(2) / lr4(3)]';
+    ang_l1_l2_before = compute_angle(l1, l2);
+    ang_l3_l4_before = compute_angle(l3, l4);
+    fprintf('Angle of l1 and l2 before transformation = %f\n', ang_l1_l2_before)
+    fprintf('Angle of l3 and l4 before transformation = %f\n', ang_l3_l4_before)
 
     % Angles of lines after transformation:
-    ang_l1_l2_after = acos((lr1c'*lr2c)/sqrt((lr1c'*lr1c)*(lr2c'*lr2c)));
-    ang_l3_l4_after = acos((lr3c'*lr4c)/sqrt((lr3c'*lr3c)*(lr4c'*lr4c)));
-    fprintf('Angle of l1 and l2 after transformation = %f ?\n', ang_l1_l2_after)
-    fprintf('Angle of l3 and l4 after transformation = %f ?\n', ang_l3_l4_after)
+    ang_l1_l2_after = compute_angle(lr1, lr2);
+    ang_l3_l4_after = compute_angle(lr3, lr4);
+    fprintf('Angle of l1 and l2 after transformation = %f\n', ang_l1_l2_after)
+    fprintf('Angle of l3 and l4 after transformation = %f\n', ang_l3_l4_after)
 end
