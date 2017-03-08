@@ -1,9 +1,3 @@
-% %% 2. Affine Rectification
-
-% I = imread('Data/0000_s.png');
-% A = load('Data/0000_s_info_lines.txt');
-% affineRectification(I, A, 424, 240, 712, 565);
-
 % The function "affineRectification" that gets as input an image I, the lines 
 % information, and the indices of the lines to use, and computes and shows an
 % affine srectification on the image.
