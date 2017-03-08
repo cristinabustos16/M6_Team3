@@ -39,7 +39,7 @@ function [I3, H_a] = metricRectification(I2, H_p, A, i1, i2, i3, i4)
     % Show the image and lines before metric rectification:
     figure;imshow(uint8(I2));
     hold on;
-    t=1:0.1:1000
+    t=1:0.1:1000;
     plot(t, -(l1_a(1)*t + l1_a(3)) / l1_a(2), 'g');
     plot(t, -(l3_a(1)*t + l3_a(3)) / l3_a(2), 'g');
     plot(t, -(d1(1)*t + d1(3)) / d1(2), 'y');
