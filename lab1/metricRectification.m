@@ -53,12 +53,16 @@ function [I3, H_a] = metricRectification(I2, H_p, A, i1, i2, i3, i4)
          s(2), s(3)];
 
     % Compute the upper triangular matrix using the Cholesky factorization:
-    K = chol(S);
+    K = inv(chol(inv(S))); % Correcto
+%     K = inv(chol(S)); % Incorrecto
 
     % Matrix for the metric rectification:
     H_a = zeros(3,3);
-    H_a(1:2, 1:2) = inv(K);
+    H_a(1:2, 1:2) = K;
     H_a(3,3) = 1;
+    
+    % Importante:
+    H_a = inv(H_a);
 
     % Rectified lines, now with only a similiratiy distortion with the real
     % world ones:
