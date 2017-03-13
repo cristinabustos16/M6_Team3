@@ -20,17 +20,20 @@ I=imread('Data/0005_s.png'); % we have to be in the proper folder
 % x' = H_s x, where H_s = (sR, t; 0^T, 1): s is an isotropic scaling factor, 
 % R is a rotation matrix (orthogonal matrix) and t is a translation vector.
 
-scalingFactor = 1;
-rotationAngle = 45 / 360 * 2 * pi;
-translationX = 0;
-translationY = 0;
-
-H=[ scalingFactor * cos(rotationAngle)   scalingFactor * -sin(rotationAngle)    translationX;
-    scalingFactor * sin(rotationAngle)   scalingFactor *  cos(rotationAngle)    translationY;
-    0                                    0                                      1];
-
-I2 = apply_H(I, H);
-figure; imshow(I); figure; imshow(uint8(I2));
+% scalingFactor = 1;
+% rotationAngle = 45 / 360 * 2 * pi;
+% translationX = 10;
+% translationY = 20;
+% 
+% H=[ scalingFactor * cos(rotationAngle)   scalingFactor * -sin(rotationAngle)    translationX;
+%     scalingFactor * sin(rotationAngle)   scalingFactor *  cos(rotationAngle)    translationY;
+%     0                                    0                                      1];
+% 
+% I2 = apply_H(I, H);
+% fig = figure(1);
+% subplot(1,2,1); imshow(I); title('Original image');
+% subplot(1,2,2); imshow(uint8(I2)); title('Similarity transformation');
+% 
 
 
 %% 1.2. Affinities
@@ -46,13 +49,17 @@ H = [ A(1,1)   A(1,2)    translationX;
       A(2,1)   A(2,2)    translationY;
       0        0         1];
 I2 = apply_H(I, H);
-figure; imshow(I); figure; imshow(uint8(I2));
+
+fig = figure(1);
+subplot(1,2,1); imshow(I); title('Original image');
+subplot(1,2,2); imshow(uint8(I2)); title('Affine transformation');
+
 
 % ToDo: decompose the affinity in four transformations: two
 % rotations, a scale, and a translation
 
 [U,D,V] = svd(A);
-RTheta = U*V';  % U --> buen resultado visual
+RTheta = U*V';
 RThetaTransform = [RTheta(1,1) RTheta(1,2) 0;
                    RTheta(2,1) RTheta(2,2) 0; 
                    0           0           1];
@@ -87,7 +94,7 @@ I2Decomposed = apply_H(I, HDecomposed);
 fig = figure(2);
 subplot(1,3,1); imshow(I); title('Original image');
 subplot(1,3,2); imshow(I2); title('Affine transformation with H');
-subplot(1,3,3); imshow(I2Decomposed); title('Affine transformation with H decomposed');
+subplot(1,3,3); imshow(I2Decomposed); title('Affine transformation with H composed');
 
 
 %% 1.3 Projective transformations (homographies)
