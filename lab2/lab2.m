@@ -8,9 +8,9 @@ addpath('sift');
 
 %% Open images
 
-imargb = imread('Data/llanes/llanes_a.jpg');
-imbrgb = imread('Data/llanes/llanes_b.jpg');
-imcrgb = imread('Data/llanes/llanes_c.jpg');
+% imargb = imread('Data/llanes/llanes_a.jpg');
+% imbrgb = imread('Data/llanes/llanes_b.jpg');
+% imcrgb = imread('Data/llanes/llanes_c.jpg');
 
 imargb = imread('Data/castle_int/0016_s.png');
 imbrgb = imread('Data/castle_int/0015_s.png');
@@ -106,71 +106,71 @@ title('Mosaic A-B-C');
 % ToDo: comment the results in every of the four cases: say why it works or
 %       does not work
 
-% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% %% 4. Refine the homography with the Gold Standard algorithm
-% 
-% % Homography ab
-% 
-% x = ...;  %ToDo: set the non-homogeneous point coordinates of the 
-% xp = ...; %      point correspondences we will refine with the geometric method
-% Xobs = [ x(:) ; xp(:) ];     % The column vector of observed values (x and x')
-% P0 = [ Hab(:) ; x(:) ];      % The parameters or independent variables
-% 
-% Y_initial = gs_errfunction( P0, Xobs ); % ToDo: create this function that we need to pass to the lsqnonlin function
-% % NOTE: gs_errfunction should return E(X) and not the sum-of-squares E=sum(E(X).^2)) that we want to minimize. 
-% % (E(X) is summed and squared implicitly in the lsqnonlin algorithm.) 
-% err_initial = sum( sum( Y_initial.^2 ));
-% 
-% options = optimset('Algorithm', 'levenberg-marquardt');
-% P = lsqnonlin(@(t) gs_errfunction(t, Xobs), P0, [], [], options);
-% 
-% Hab_r = reshape( P(1:9), 3, 3 );
-% f = gs_errfunction( P, Xobs ); % lsqnonlin does not return f
-% err_final = sum( sum( f.^2 ));
-% 
-% % we show the geometric error before and after the refinement
-% fprintf(1, 'Gold standard reproj error initial %f, final %f\n', err_initial, err_final);
-% 
-% 
-% %% See differences in the keypoint locations
-% 
-% % ToDo: compute the points xhat and xhatp which are the correspondences
-% % returned by the refinement with the Gold Standard algorithm
-% 
-% figure;
-% imshow(imargb);%image(imargb);
-% hold on;
-% plot(x(1,:), x(2,:),'+y');
-% plot(xhat(1,:), xhat(2,:),'+c');
-% 
-% figure;
-% imshow(imbrgb);%image(imbrgb);
-% hold on;
-% plot(xp(1,:), xp(2,:),'+y');
-% plot(xhatp(1,:), xhatp(2,:),'+c');
-% 
-% %%  Homography bc
-% 
-% % ToDo: refine the homography bc with the Gold Standard algorithm
-% 
-% 
-% %% See differences in the keypoint locations
-% 
-% % ToDo: compute the points xhat and xhatp which are the correspondences
-% % returned by the refinement with the Gold Standard algorithm
-% 
-% figure;
-% imshow(imbrgb);%image(imbrgb);
-% hold on;
-% plot(x(1,:), x(2,:),'+y');
-% plot(xhat(1,:), xhat(2,:),'+c');
-% 
-% figure;
-% imshow(imcrgb);%image(imcrgb);
-% hold on;
-% plot(xp(1,:), xp(2,:),'+y');
-% plot(xhatp(1,:), xhatp(2,:),'+c');
-% 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% 4. Refine the homography with the Gold Standard algorithm
+
+% Homography ab
+
+x = euclid(xab_a(:,inliers_ab));  %ToDo: set the non-homogeneous point coordinates of the 
+xp = euclid(xab_b(:,inliers_ab)); %      point correspondences we will refine with the geometric method
+Xobs = [ x(:) ; xp(:) ];     % The column vector of observed values (x and x')
+P0 = [ Hab(:) ; x(:) ];      % The parameters or independent variables
+
+Y_initial = gs_errfunction( P0, Xobs ); % ToDo: create this function that we need to pass to the lsqnonlin function
+% NOTE: gs_errfunction should return E(X) and not the sum-of-squares E=sum(E(X).^2)) that we want to minimize. 
+% (E(X) is summed and squared implicitly in the lsqnonlin algorithm.) 
+err_initial = sum( sum( Y_initial.^2 ));
+
+options = optimset('Algorithm', 'levenberg-marquardt');
+P = lsqnonlin(@(t) gs_errfunction(t, Xobs), P0, [], [], options);
+
+Hab_r = reshape( P(1:9), 3, 3 );
+f = gs_errfunction( P, Xobs ); % lsqnonlin does not return f
+err_final = sum( sum( f.^2 ));
+
+% we show the geometric error before and after the refinement
+fprintf(1, 'Gold standard reproj error initial %f, final %f\n', err_initial, err_final);
+
+
+%% See differences in the keypoint locations
+
+% ToDo: compute the points xhat and xhatp which are the correspondences
+% returned by the refinement with the Gold Standard algorithm
+
+figure;
+imshow(imargb);%image(imargb);
+hold on;
+plot(x(1,:), x(2,:),'+y');
+plot(xhat(1,:), xhat(2,:),'+c');
+
+figure;
+imshow(imbrgb);%image(imbrgb);
+hold on;
+plot(xp(1,:), xp(2,:),'+y');
+plot(xhatp(1,:), xhatp(2,:),'+c');
+
+%%  Homography bc
+
+% ToDo: refine the homography bc with the Gold Standard algorithm
+
+
+%% See differences in the keypoint locations
+
+% ToDo: compute the points xhat and xhatp which are the correspondences
+% returned by the refinement with the Gold Standard algorithm
+
+figure;
+imshow(imbrgb);%image(imbrgb);
+hold on;
+plot(x(1,:), x(2,:),'+y');
+plot(xhat(1,:), xhat(2,:),'+c');
+
+figure;
+imshow(imcrgb);%image(imcrgb);
+hold on;
+plot(xp(1,:), xp(2,:),'+y');
+plot(xhatp(1,:), xhatp(2,:),'+c');
+
 % %% Build mosaic
 % corners = [-400 1200 -100 650];
 % iwb = apply_H_v2(imbrgb, ??, corners); % ToDo: complete the call to the function
@@ -180,7 +180,7 @@ title('Mosaic A-B-C');
 % figure;
 % imshow(max(iwc, max(iwb, iwa)));%image(max(iwc, max(iwb, iwa)));axis off;
 % title('Mosaic A-B-C');
-% 
+
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % %% 5. OPTIONAL: Calibration with a planar pattern
 % 
