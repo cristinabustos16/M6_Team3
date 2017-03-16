@@ -102,7 +102,6 @@ title('Mosaic A-B-C');
 
 % ToDo: compute the mosaic with castle_int images
 % ToDo: compute the mosaic with aerial images set 13
-% test
 % ToDo: compute the mosaic with aerial images set 22
 % ToDo: comment the results in every of the four cases: say why it works or
 %       does not work
