@@ -42,8 +42,18 @@ function idx_inliers = compute_inliers(H, x1, x2, th)
     
 
     % compute the symmetric geometric error
-    d2 = % ToDo
+    % d2 = % ToDo
+
+    d2 = zeros(1, size(x1, 2));
+    for i=1:size(x1, 2)
+        d2(i) = compute_symmetric_difference(x1(:,i), x2(:,i), H);
+    end
+
     idx_inliers = find(d2 < th.^2);
+
+function diff = compute_symmetric_difference(x1, x2, H)
+    % book p.95 (pdf page 112)
+    diff = norm(x1-inv(H)*x2) + norm(x2-H*x1);
 
 
 function xn = normalise(x)    
