@@ -88,24 +88,24 @@ plotmatches(imb, imc, points_b(1:2,:), points_c(1:2,:), ...
 
 vgg_gui_H(imbrgb, imcrgb, Hbc);
 
-% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% %% 3. Build the mosaic
-% 
-% corners = [-400 1200 -100 650];
-% iwb = apply_H_v2(imbrgb, ?? , corners);   % ToDo: complete the call to the function
-% iwa = apply_H_v2(imargb, ??, corners);    % ToDo: complete the call to the function
-% iwc = apply_H_v2(imcrgb, ??, corners);    % ToDo: complete the call to the function
-% 
-% figure;
-% imshow(max(iwc, max(iwb, iwa)));%image(max(iwc, max(iwb, iwa)));axis off;
-% title('Mosaic A-B-C');
-% 
-% % ToDo: compute the mosaic with castle_int images
-% % ToDo: compute the mosaic with aerial images set 13
-% % ToDo: compute the mosaic with aerial images set 22
-% % ToDo: comment the results in every of the four cases: say why it works or
-% %       does not work
-% 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% 3. Build the mosaic
+
+corners = [-400 1200 -100 650];
+iwb = apply_H_v2(imbrgb, eye(3) , corners);   % ToDo: complete the call to the function
+iwa = apply_H_v2(imargb, inv(Hab), corners);    % ToDo: complete the call to the function
+iwc = apply_H_v2(imcrgb, Hbc, corners);    % ToDo: complete the call to the function
+
+figure;
+imshow(max(iwc, max(iwb, iwa)));%image(max(iwc, max(iwb, iwa)));axis off;
+title('Mosaic A-B-C');
+
+% ToDo: compute the mosaic with castle_int images
+% ToDo: compute the mosaic with aerial images set 13
+% ToDo: compute the mosaic with aerial images set 22
+% ToDo: comment the results in every of the four cases: say why it works or
+%       does not work
+
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % %% 4. Refine the homography with the Gold Standard algorithm
 % 
