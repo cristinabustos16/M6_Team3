@@ -53,7 +53,7 @@ function idx_inliers = compute_inliers(H, x1, x2, th)
 
 function diff = compute_symmetric_difference(x1, x2, H)
     % book p.95 (pdf page 112)
-    diff = norm(x1-inv(H)*x2) + norm(x2-H*x1);
+    diff = norm(euclid(x1)-euclid(inv(H)*x2)) + norm(euclid(x2)-euclid(H*x1));
 
 
 function xn = normalise(x)    
