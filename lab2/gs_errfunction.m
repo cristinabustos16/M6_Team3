@@ -21,10 +21,7 @@ x_hat = [x_hat; ones(1,lenght_x_hat)];
 % Calculate Homography * x_hat and the error between estimates and observations
 x_hat_p = H * x_hat;
 
-error1 = norm(x - euclid(x_hat));
-error2 = norm(xp - euclid(x_hat_p));
+error1 = x - euclid(x_hat);
+error2 = xp - euclid(x_hat_p);
 
-error = [error1 error2];
-
-
-end
+error = [error1(:) error2(:)];
