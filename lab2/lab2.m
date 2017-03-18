@@ -137,6 +137,14 @@ fprintf(1, 'Gold standard reproj error initial %f, final %f\n', err_initial, err
 % ToDo: compute the points xhat and xhatp which are the correspondences
 % returned by the refinement with the Gold Standard algorithm
 
+xhat = P0(10:end);
+lenght_x_hat = size(xhat,1)/2;
+xhat = reshape(xhat, [2,lenght_x_hat]);
+xhat = [xhat; ones(1,lenght_x_hat)];
+
+H = reshape(P0(1:9), [3,3]);
+xhatp = H * x_hat;
+
 figure;
 imshow(imargb);%image(imargb);
 hold on;
