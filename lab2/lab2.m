@@ -206,15 +206,15 @@ hold on;
 plot(xp(1,:), xp(2,:),'+y');
 plot(xhatp(1,:), xhatp(2,:),'+c');
 
-% %% Build mosaic
-% corners = [-400 1200 -100 650];
-% iwb = apply_H_v2(imbrgb, ??, corners); % ToDo: complete the call to the function
-% iwa = apply_H_v2(imargb, ??, corners); % ToDo: complete the call to the function
-% iwc = apply_H_v2(imcrgb, ??, corners); % ToDo: complete the call to the function
-% 
-% figure;
-% imshow(max(iwc, max(iwb, iwa)));%image(max(iwc, max(iwb, iwa)));axis off;
-% title('Mosaic A-B-C');
+%% Build mosaic
+corners = [-400 1200 -100 650];
+iwb = apply_H_v2(imbrgb, eye(3), corners); % ToDo: complete the call to the function
+iwa = apply_H_v2(imargb, Hab_gs, corners); % ToDo: complete the call to the function
+iwc = apply_H_v2(imcrgb, inv(Hbc_gs), corners); % ToDo: complete the call to the function
+
+figure;
+imshow(max(iwc, max(iwb, iwa)));%image(max(iwc, max(iwb, iwa)));axis off;
+title('Mosaic A-B-C');
 
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % %% 5. OPTIONAL: Calibration with a planar pattern
