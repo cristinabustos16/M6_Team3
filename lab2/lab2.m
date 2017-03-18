@@ -142,8 +142,8 @@ lenght_x_hat = size(xhat,1)/2;
 xhat = reshape(xhat, [2,lenght_x_hat]);
 xhat = [xhat; ones(1,lenght_x_hat)];
 
-H = reshape(P0(1:9), [3,3]);
-xhatp = H * x_hat;
+Hab_gs = reshape(P0(1:9), [3,3]);
+xhatp = Hab_gs * x_hat;
 
 figure;
 imshow(imargb);%image(imargb);
@@ -160,12 +160,39 @@ plot(xhatp(1,:), xhatp(2,:),'+c');
 %%  Homography bc
 
 % ToDo: refine the homography bc with the Gold Standard algorithm
+x = xbc_b(1:2,inliers_bc);  %ToDo: set the non-homogeneous point coordinates of the 
+xp = xbc_c(1:2,inliers_bc); %      point correspondences we will refine with the geometric method
+Xobs = [ x(:) ; xp(:) ];     % The column vector of observed values (x and x')
+P0 = [ Hbc(:) ; x(:) ];      % The parameters or independent variables
+
+Y_initial = gs_errfunction( P0, Xobs ); % ToDo: create this function that we need to pass to the lsqnonlin function
+% NOTE: gs_errfunction should return E(X) and not the sum-of-squares E=sum(E(X).^2)) that we want to minimize. 
+% (E(X) is summed and squared implicitly in the lsqnonlin algorithm.) 
+err_initial = sum( sum( Y_initial.^2 ));
+
+options = optimset('Algorithm', 'levenberg-marquardt');
+P = lsqnonlin(@(t) gs_errfunction(t, Xobs), P0, [], [], options);
+
+Hbc_r = reshape( P(1:9), 3, 3 );
+f = gs_errfunction( P, Xobs ); % lsqnonlin does not return f
+err_final = sum( sum( f.^2 ));
+
+% we show the geometric error before and after the refinement
+fprintf(1, 'Gold standard reproj error initial %f, final %f\n', err_initial, err_final);
+
 
 
 %% See differences in the keypoint locations
 
 % ToDo: compute the points xhat and xhatp which are the correspondences
 % returned by the refinement with the Gold Standard algorithm
+xhat = P0(10:end);
+lenght_x_hat = size(xhat,1)/2;
+xhat = reshape(xhat, [2,lenght_x_hat]);
+xhat = [xhat; ones(1,lenght_x_hat)];
+
+Hbc_gs = reshape(P0(1:9), [3,3]);
+xhatp = Hbc_gs * x_hat;
 
 figure;
 imshow(imbrgb);%image(imbrgb);
