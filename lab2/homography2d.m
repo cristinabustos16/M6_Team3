@@ -5,7 +5,8 @@ function H = homography2d(x1, x2)
     % x2: set of points in plane 2. size(x2) = [ncoord, npoints]
     %
     % This function takes two sets of corresponding points between two
-    % projective planes P^2, and compute the homography tha relates them.
+    % projective planes P^2, and compute the homography tha relates them,
+    % using the normalized DLT algorithm.
     % If the system does not have an exact solution, the least squares
     % solution will be found.
     
@@ -23,13 +24,19 @@ function H = homography2d(x1, x2)
         error('Points must have three coordinates.')
     end
     
+    % Normalize points x1:
+    [x1norm, T1] = find_normalization(x1);
+    
+    % Normalize points x2:
+    [x2norm, T2] = find_normalization(x2);
+    
     % Initialize A:
     A = zeros(2 * npoints, 9);
     
     % Loop over each pair of correspondences:
     for i = 1:npoints
-        A((2*i-1):(2*i), :) = [0, 0, 0           , -x2(3,i) * x1(:,i)', x2(2,i) * x1(:,i)';
-                               x2(3,i) * x1(:,i)', 0, 0, 0            , -x2(1,i) * x1(:,i)'];
+        A((2*i-1):(2*i), :) = [0, 0, 0                   , -x2norm(3,i) * x1norm(:,i)', x2norm(2,i) * x1norm(:,i)';
+                               x2norm(3,i) * x1norm(:,i)', 0, 0, 0                    , -x2norm(1,i) * x1norm(:,i)'];
     end
     
     % Singula value decomposition:
@@ -42,6 +49,9 @@ function H = homography2d(x1, x2)
     H = [h(1), h(2), h(3);
          h(4), h(5), h(6);
          h(7), h(8), h(9)];
+     
+     % Denormalize:
+     H = inv(T2) * H * T1;
 
     return
 end
