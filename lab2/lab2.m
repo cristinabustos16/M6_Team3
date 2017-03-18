@@ -111,8 +111,8 @@ title('Mosaic A-B-C');
 
 % Homography ab
 
-x = euclid(xab_a(:,inliers_ab));  %ToDo: set the non-homogeneous point coordinates of the 
-xp = euclid(xab_b(:,inliers_ab)); %      point correspondences we will refine with the geometric method
+x = xab_a(1:2,inliers_ab);  %ToDo: set the non-homogeneous point coordinates of the 
+xp = xab_b(1:2,inliers_ab); %      point correspondences we will refine with the geometric method
 Xobs = [ x(:) ; xp(:) ];     % The column vector of observed values (x and x')
 P0 = [ Hab(:) ; x(:) ];      % The parameters or independent variables
 
