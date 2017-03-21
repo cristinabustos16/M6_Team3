@@ -12,17 +12,17 @@ addpath('sift');
 % imbrgb = imread('Data/llanes/llanes_b.jpg');
 % imcrgb = imread('Data/llanes/llanes_c.jpg');
 
-% imargb = imread('Data/castle_int/0016_s.png');
-% imbrgb = imread('Data/castle_int/0015_s.png');
-% imcrgb = imread('Data/castle_int/0014_s.png');
+ imargb = imread('Data/castle_int/0016_s.png');
+ imbrgb = imread('Data/castle_int/0015_s.png');
+ imcrgb = imread('Data/castle_int/0014_s.png');
 
 % imargb = imread('Data/aerial/site13/frame00000.png');
 % imbrgb = imread('Data/aerial/site13/frame00002.png');
 % imcrgb = imread('Data/aerial/site13/frame00003.png');
 
-imargb = imresize(imread('Data/my_kitchen/kitchen1.jpg'), 'scale', 0.15);
-imbrgb = imresize(imread('Data/my_kitchen/kitchen2.jpg'), 'scale', 0.15);
-imcrgb = imresize(imread('Data/my_kitchen/kitchen3.jpg'), 'scale', 0.15);
+%imargb = imresize(imread('Data/my_kitchen/kitchen1.jpg'), 'scale', 0.15);
+%imbrgb = imresize(imread('Data/my_kitchen/kitchen2.jpg'), 'scale', 0.15);
+%imcrgb = imresize(imread('Data/my_kitchen/kitchen3.jpg'), 'scale', 0.15);
 
 % imargb = imresize(imread('Data/carrer_casp/casp1.jpg'), 'scale', 0.15);
 % imbrgb = imresize(imread('Data/carrer_casp/casp2.jpg'), 'scale', 0.15);
@@ -150,8 +150,7 @@ lenght_x_hat = size(xhat,1)/2;
 xhat = reshape(xhat, [2,lenght_x_hat]);
 xhat = [xhat; ones(1,lenght_x_hat)];
 
-Hab_gs = reshape(P0(1:9), [3,3]);
-xhatp = Hab_gs * xhat;
+xhatp = Hab_r * xhat;
 
 figure;
 imshow(imargb);%image(imargb);
@@ -198,9 +197,7 @@ xhat = P0(10:end);
 lenght_x_hat = size(xhat,1)/2;
 xhat = reshape(xhat, [2,lenght_x_hat]);
 xhat = [xhat; ones(1,lenght_x_hat)];
-
-Hbc_gs = reshape(P0(1:9), [3,3]);
-xhatp = Hbc_gs * xhat;
+xhatp = Hbc_r * xhat;
 
 figure;
 imshow(imbrgb);%image(imbrgb);
@@ -217,8 +214,8 @@ plot(xhatp(1,:), xhatp(2,:),'+c');
 %% Build mosaic
 corners = [-400 1200 -100 650];
 iwb = apply_H_v2(imbrgb, eye(3), corners); % ToDo: complete the call to the function
-iwa = apply_H_v2(imargb, Hab_gs, corners); % ToDo: complete the call to the function
-iwc = apply_H_v2(imcrgb, inv(Hbc_gs), corners); % ToDo: complete the call to the function
+iwa = apply_H_v2(imargb, Hab_r, corners); % ToDo: complete the call to the function
+iwc = apply_H_v2(imcrgb, inv(Hbc_r), corners); % ToDo: complete the call to the function
 
 figure;
 imshow(max(iwc, max(iwb, iwa)));%image(max(iwc, max(iwb, iwa)));axis off;
