@@ -1,15 +1,11 @@
 %%%%% Add logo to image.
-
-clearvars
-close all
+function addlogo(logoname)
 
 % Destination image:
 des = imread('./Data/castle_int/0016_s.png');
 
 % Logo:
-logo = imread('onlylogo_cocacola.png');
-% logo = imread('onlylogo_ibm.png');
-% logo = imread('onlylogo_gadis.png');
+logo = imread(['onlylogo_', logoname, '.png']);
 
 % Point 1 (upper left corner):
 % pdes1 = [216, 401];
@@ -55,13 +51,22 @@ logo_trans = apply_H_v2(logo, H, corners);
 figure()
 imshow(logo_trans)
 
-% mask(:,:,1) = uint8(logo_trans(:,:,3) < 100); % ad-hoc para ibm
-mask(:,:,1) = uint8(logo_trans(:,:,1) < 5); % ad-hoc para gadis
-% mask(:,:,1) = uint8(logo_trans(:,:,1) < 100); % ad-hoc para cocacola
+if(strcmp(logoname, 'cocacola'))
+    mask(:,:,1) = uint8(logo_trans(:,:,1) < 100); % ad-hoc para cocacola
+elseif(strcmp(logoname, 'ibm'))
+    mask(:,:,1) = uint8(logo_trans(:,:,3) < 100); % ad-hoc para ibm
+elseif(strcmp(logoname, 'gadis'))
+    mask(:,:,1) = uint8(logo_trans(:,:,1) < 5); % ad-hoc para gadis     
+else
+    error('logo name not recognized.')
+end
 mask(:,:,2) = mask(:,:,1);
 mask(:,:,3) = mask(:,:,1);
-% mask = uint8(logo_trans == 0);
 
 newimage = logo_trans + des .* mask;
 figure()
 imshow(newimage)
+
+return
+
+end

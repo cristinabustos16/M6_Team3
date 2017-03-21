@@ -358,8 +358,14 @@ title('Mosaic A-B-C');
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% 6. OPTIONAL: Add a logo to an image using the DLT algorithm
 
+addpath('logos')
+
 % Add the Coca-Cola logo to the castle image:
-addlogo
+addlogo('cocacola')
+
+% Other logos that can be added:
+addlogo('ibm')
+addlogo('gadis')
 
 
 
