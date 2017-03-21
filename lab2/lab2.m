@@ -12,13 +12,21 @@ addpath('sift');
 % imbrgb = imread('Data/llanes/llanes_b.jpg');
 % imcrgb = imread('Data/llanes/llanes_c.jpg');
 
-imargb = imread('Data/castle_int/0016_s.png');
-imbrgb = imread('Data/castle_int/0015_s.png');
-imcrgb = imread('Data/castle_int/0014_s.png');
+% imargb = imread('Data/castle_int/0016_s.png');
+% imbrgb = imread('Data/castle_int/0015_s.png');
+% imcrgb = imread('Data/castle_int/0014_s.png');
 
 % imargb = imread('Data/aerial/site13/frame00000.png');
 % imbrgb = imread('Data/aerial/site13/frame00002.png');
 % imcrgb = imread('Data/aerial/site13/frame00003.png');
+
+% imargb = imresize(imread('Data/my_kitchen/kitchen1.jpg'), 'scale', 0.2);
+% imbrgb = imresize(imread('Data/my_kitchen/kitchen2.jpg'), 'scale', 0.2);
+% imcrgb = imresize(imread('Data/my_kitchen/kitchen3.jpg'), 'scale', 0.2);
+
+imargb = imresize(imread('Data/carrer_casp/casp1.jpg'), 'scale', 0.22);
+imbrgb = imresize(imread('Data/carrer_casp/casp2.jpg'), 'scale', 0.2);
+imcrgb = imresize(imread('Data/carrer_casp/casp3.jpg'), 'scale', 0.2);
 
 ima = sum(double(imargb), 3) / 3 / 255;
 imb = sum(double(imbrgb), 3) / 3 / 255;
@@ -347,8 +355,11 @@ title('Mosaic A-B-C');
 % 
 % % ToDo: change the virtual object, use another 3D simple geometric object like a pyramid
 % 
-% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% %% 6. OPTIONAL: Add a logo to an image using the DLT algorithm
-% 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% 6. OPTIONAL: Add a logo to an image using the DLT algorithm
+
+% Add the Coca-Cola logo to the castle image:
+addlogo
+
 
 
