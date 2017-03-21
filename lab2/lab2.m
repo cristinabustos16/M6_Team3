@@ -20,13 +20,13 @@ addpath('sift');
 % imbrgb = imread('Data/aerial/site13/frame00002.png');
 % imcrgb = imread('Data/aerial/site13/frame00003.png');
 
-% imargb = imresize(imread('Data/my_kitchen/kitchen1.jpg'), 'scale', 0.2);
-% imbrgb = imresize(imread('Data/my_kitchen/kitchen2.jpg'), 'scale', 0.2);
-% imcrgb = imresize(imread('Data/my_kitchen/kitchen3.jpg'), 'scale', 0.2);
+imargb = imresize(imread('Data/my_kitchen/kitchen1.jpg'), 'scale', 0.15);
+imbrgb = imresize(imread('Data/my_kitchen/kitchen2.jpg'), 'scale', 0.15);
+imcrgb = imresize(imread('Data/my_kitchen/kitchen3.jpg'), 'scale', 0.15);
 
-imargb = imresize(imread('Data/carrer_casp/casp1.jpg'), 'scale', 0.22);
-imbrgb = imresize(imread('Data/carrer_casp/casp2.jpg'), 'scale', 0.2);
-imcrgb = imresize(imread('Data/carrer_casp/casp3.jpg'), 'scale', 0.2);
+% imargb = imresize(imread('Data/carrer_casp/casp1.jpg'), 'scale', 0.15);
+% imbrgb = imresize(imread('Data/carrer_casp/casp2.jpg'), 'scale', 0.15);
+% imcrgb = imresize(imread('Data/carrer_casp/casp3.jpg'), 'scale', 0.15);
 
 ima = sum(double(imargb), 3) / 3 / 255;
 imb = sum(double(imbrgb), 3) / 3 / 255;
