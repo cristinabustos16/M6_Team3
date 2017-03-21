@@ -221,68 +221,95 @@ figure;
 imshow(max(iwc, max(iwb, iwa)));%image(max(iwc, max(iwb, iwa)));axis off;
 title('Mosaic A-B-C');
 
-% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% %% 5. OPTIONAL: Calibration with a planar pattern
-% 
-% clear all;
-% 
-% %% Read template and images.
-% T     = imread('Data/calib/template.jpg');
-% I{1}  = imread('Data/calib/graffiti1.tif');
-% I{2}  = imread('Data/calib/graffiti2.tif');
-% I{3}  = imread('Data/calib/graffiti3.tif');
-% %I{4}  = imread('Data/calib/graffiti4.tif');
-% %I{5}  = imread('Data/calib/graffiti5.tif');
-% Tg = sum(double(T), 3) / 3 / 255;
-% Ig{1} = sum(double(I{1}), 3) / 3 / 255;
-% Ig{2} = sum(double(I{2}), 3) / 3 / 255;
-% Ig{3} = sum(double(I{3}), 3) / 3 / 255;
-% 
-% N = length(I);
-% 
-% %% Compute keypoints.
-% fprintf('Computing sift points in template... ');
-% [pointsT, descrT] = sift(Tg, 'Threshold', 0.05);
-% fprintf(' done\n');
-% 
-% points = cell(N,1);
-% descr = cell(N,1);
-% for i = 1:N
-%     fprintf('Computing sift points in image %d... ', i);
-%     [points{i}, descr{i}] = sift(Ig{i}, 'Threshold', 0.05);
-%     fprintf(' done\n');
-% end
-% 
-% %% Match and compute homographies.
-% H = cell(N,1);
-% for i = 1:N
-%     % Match against template descriptors.
-%     fprintf('Matching image %d... ', i);
-%     matches = siftmatch(descrT, descr{i});
-%     fprintf('done\n');
-% 
-%     % Fit homography and remove outliers.
-%     x1 = pointsT(1:2, matches(1, :));
-%     x2 = points{i}(1:2, matches(2, :));
-%     H{i} = 0;
-%     [H{i}, inliers] =  ransac_homography_adaptive_loop(homog(x1), homog(x2), 3, 1000);
-% 
-%     % Plot inliers.
-%     figure;
-%     plotmatches(Tg, Ig{i}, pointsT(1:2,:), points{i}(1:2,:), matches(:, inliers));
-% 
-%     % Play with the homography
-%     %vgg_gui_H(T, I{i}, H{i});
-% end
-% 
-% %% Compute the Image of the Absolute Conic
-% 
-% w = ... % ToDo
-%  
-% %% Recover the camera calibration.
-% 
-% K = ... % ToDo
-%     
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% 5. OPTIONAL: Calibration with a planar pattern
+
+clear all;
+
+%% Read template and images.
+T     = imread('Data/calib/template.jpg');
+I{1}  = imread('Data/calib/graffiti1.tif');
+I{2}  = imread('Data/calib/graffiti2.tif');
+I{3}  = imread('Data/calib/graffiti3.tif');
+%I{4}  = imread('Data/calib/graffiti4.tif');
+%I{5}  = imread('Data/calib/graffiti5.tif');
+Tg = sum(double(T), 3) / 3 / 255;
+Ig{1} = sum(double(I{1}), 3) / 3 / 255;
+Ig{2} = sum(double(I{2}), 3) / 3 / 255;
+Ig{3} = sum(double(I{3}), 3) / 3 / 255;
+
+N = length(I);
+
+%% Compute keypoints.
+fprintf('Computing sift points in template... ');
+[pointsT, descrT] = sift(Tg, 'Threshold', 0.05);
+fprintf(' done\n');
+
+points = cell(N,1);
+descr = cell(N,1);
+for i = 1:N
+    fprintf('Computing sift points in image %d... ', i);
+    [points{i}, descr{i}] = sift(Ig{i}, 'Threshold', 0.05);
+    fprintf(' done\n');
+end
+
+%% Match and compute homographies.
+H = cell(N,1);
+for i = 1:N
+    % Match against template descriptors.
+    fprintf('Matching image %d... ', i);
+    matches = siftmatch(descrT, descr{i});
+    fprintf('done\n');
+
+    % Fit homography and remove outliers.
+    x1 = pointsT(1:2, matches(1, :));
+    x2 = points{i}(1:2, matches(2, :));
+    H{i} = 0;
+    [H{i}, inliers] =  ransac_homography_adaptive_loop(homog(x1), homog(x2), 3, 1000);
+
+    % Plot inliers.
+    figure;
+    plotmatches(Tg, Ig{i}, pointsT(1:2,:), points{i}(1:2,:), matches(:, inliers));
+
+    % Play with the homography
+    vgg_gui_H(T, I{i}, H{i});
+end
+
+%% Compute the Image of the Absolute Conic
+
+% 2 linear equations on the 6 independent coefficients of w for each image
+V = zeros(2*N,6);
+
+for n=1:N
+   Hn = H{n};
+   
+   %First equation V(1,2)' * omega = 0; 
+   i = 1;
+   j = 2; 
+   v_12_T = get_v_ij_T(Hn,i,j);
+   V(2*n - 1, :) = v_12_T;
+   
+   %Second equation V(1,1)'-V(2,2)' * omega = 0
+   i = 1;
+   j = 1;
+   v_11_T = get_v_ij_T(Hn,i,j);
+   i = 2;
+   j = 2;
+   v_22_T = get_v_ij_T(Hn,i,j);
+   V(2*n, :) = v_11_T - v_22_T;
+end
+[U, D, U_T] = svd(V);
+
+omega = U_T(:,end);
+
+w = [omega(1), omega(2), omega(3); 
+     omega(2), omega(4), omega(5); 
+     omega(3), omega(5), omega(6)]; % ToDo
+ 
+%% Recover the camera calibration.
+
+K = chol(inv(w),'upper'); % ToDo
+    
 % % ToDo: in the report make some comments related to the obtained internal
 % %       camera parameters and also comment their relation to the image size
 % 
