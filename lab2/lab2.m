@@ -151,7 +151,7 @@ xhat = reshape(xhat, [2,lenght_x_hat]);
 xhat = [xhat; ones(1,lenght_x_hat)];
 
 Hab_gs = reshape(P0(1:9), [3,3]);
-xhatp = Hab_gs * x_hat;
+xhatp = Hab_gs * xhat;
 
 figure;
 imshow(imargb);%image(imargb);
@@ -200,7 +200,7 @@ xhat = reshape(xhat, [2,lenght_x_hat]);
 xhat = [xhat; ones(1,lenght_x_hat)];
 
 Hbc_gs = reshape(P0(1:9), [3,3]);
-xhatp = Hbc_gs * x_hat;
+xhatp = Hbc_gs * xhat;
 
 figure;
 imshow(imbrgb);%image(imbrgb);
