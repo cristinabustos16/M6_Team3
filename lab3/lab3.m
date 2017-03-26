@@ -54,7 +54,7 @@ subplot(1,2,2); imshow(im2rgb); axis image; title('Image 2');
 [points_2, desc_2] = sift(im2, 'Threshold', 0.01);
 
 %% Match SIFT keypoints between a and b
-%matches = siftmatch(desc_1, desc_2);
+matches = siftmatch(desc_1, desc_2);
 figure;
 plotmatches(im1, im2, points_1(1:2,:), points_2(1:2,:), matches, 'Stacking', 'v');
 
@@ -73,41 +73,41 @@ title('Inliers');
 vgg_gui_F(im1rgb, im2rgb, F');
 
 
-% %% Plot some epipolar lines
-% 
-% l2 = ... % epipolar lines in image 2 % ToDo
-% l1 = ... % epipolar lines in image 1 % ToDo
-% 
-% % choose three random indices
-% m1 = inliers(10);
-% m2 = inliers(20);
-% m3 = inliers(30);
-% 
-% % image 1 (plot the three points and their corresponding epipolar lines)
-% figure;
-% imshow(im1rgb);
-% hold on;
-% plot(p1(1, m1), p1(2, m1), '+g');
-% plot_homog_line(l1(:, m1));
-% 
-% plot(p1(1, m2), p1(2, m2), '+g');
-% plot_homog_line(l1(:, m2));
-% 
-% plot(p1(1, m3), p1(2, m3), '+g');
-% plot_homog_line(l1(:, m3));
-% 
-% % image 2 (plot the three points and their corresponding epipolar lines)
-% figure;
-% imshow(im2rgb);
-% hold on;
-% plot(p2(1, m1), p2(2, m1), '+g');
-% plot_homog_line(l2(:, m1));
-% 
-% plot(p2(1, m2), p2(2, m2), '+g');
-% plot_homog_line(l2(:, m2));
-% 
-% plot(p2(1, m3), p2(2, m3), '+g');
-% plot_homog_line(l2(:, m3));
+%% Plot some epipolar lines
+
+l2 = F*p1; % epipolar lines in image 2 % ToDo
+l1 = F'*p2; % epipolar lines in image 1 % ToDo
+
+% choose three random indices
+m1 = inliers(10);
+m2 = inliers(20);
+m3 = inliers(30);
+
+% image 1 (plot the three points and their corresponding epipolar lines)
+figure;
+imshow(im1rgb);
+hold on;
+plot(p1(1, m1), p1(2, m1), '+g');
+plot_homog_line(l1(:, m1));
+
+plot(p1(1, m2), p1(2, m2), '+g');
+plot_homog_line(l1(:, m2));
+
+plot(p1(1, m3), p1(2, m3), '+g');
+plot_homog_line(l1(:, m3));
+
+% image 2 (plot the three points and their corresponding epipolar lines)
+figure;
+imshow(im2rgb);
+hold on;
+plot(p2(1, m1), p2(2, m1), '+g');
+plot_homog_line(l2(:, m1));
+
+plot(p2(1, m2), p2(2, m2), '+g');
+plot_homog_line(l2(:, m2));
+
+plot(p2(1, m3), p2(2, m3), '+g');
+plot_homog_line(l2(:, m3));
 
 
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
