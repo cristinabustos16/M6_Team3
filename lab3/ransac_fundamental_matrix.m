@@ -38,13 +38,22 @@ inliers = best_inliers;
 % The inliers are obtained with a threshold on the first order 
 % approximation of the geometric error: Sampson distance
 function idx_inliers = compute_inliers(F, p1, p2, th)
-    
-    % transformed points (in both directions)
+
+     % transformed points (in both directions)
     Fx = F * p1;  % naming convention to follow slide 3 of lab3.pdf
     Ftxp = F' * p2;  % naming convention to follow slide 3 of lab3.pdf
     
+    % http://cariparo.dei.unipd.it/documents/corso_psc_07-08/sensorfusion/matlab/filemcv/sampson.m/view
+    p2tFx_size = size(p2,2);
+
+    p2tFx = zeros(1,p2tFx_size);
+    for i = 1:p2tFx_size
+        p2tFx(i) = p2(:,i)'*Fx(:,i);
+    end
+
+    
     % compute the Sampson distance
-    d = ((p2'*Fx).^2) / (Fx(1,:).^2 + Fx(2,:).^2 + Ftxp(1,:).^2 + Ftxp(2,:).^2);
+    d = (p2tFx.^2) / (Fx(1,:).^2 + Fx(2,:).^2 + Ftxp(1,:).^2 + Ftxp(2,:).^2);
     idx_inliers = find(d < th.^2);
 
 
