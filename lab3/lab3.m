@@ -54,7 +54,7 @@ subplot(1,2,2); imshow(im2rgb); axis image; title('Image 2');
 [points_2, desc_2] = sift(im2, 'Threshold', 0.01);
 
 %% Match SIFT keypoints between a and b
-matches = siftmatch(desc_1, desc_2);
+%matches = siftmatch(desc_1, desc_2);
 figure;
 plotmatches(im1, im2, points_1(1:2,:), points_2(1:2,:), matches, 'Stacking', 'v');
 
