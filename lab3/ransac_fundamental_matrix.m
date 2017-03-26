@@ -53,7 +53,7 @@ function idx_inliers = compute_inliers(F, p1, p2, th)
 
     
     % compute the Sampson distance
-    d = (p2tFx.^2) / (Fx(1,:).^2 + Fx(2,:).^2 + Ftxp(1,:).^2 + Ftxp(2,:).^2);
+    d = (p2tFx.^2) ./ (Fx(1,:).^2 + Fx(2,:).^2 + Ftxp(1,:).^2 + Ftxp(2,:).^2);
     idx_inliers = find(d < th.^2);
 
 
