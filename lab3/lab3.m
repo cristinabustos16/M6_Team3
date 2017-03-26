@@ -27,52 +27,52 @@ Tx = [0 -t(3) t(2); t(3) 0 -t(1); -t(2) t(1) 0];
 F_gt = Tx * R; % ToDo: write the expression of the real fundamental matrix for P1 and P2
 
 % Evaluation: these two matrices should be very similar
-F_gt / norm(F_gt)
-F_es / norm(F_es)
+F_gt / norm(F_gt);
+F_es / norm(F_es);
 
 
-% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% %% 2. Robustly fit fundamental matrix
-% 
-% % Read images
-% im1rgb = imread('Data/0000_s.png');
-% im2rgb = imread('Data/0001_s.png');
-% im1 = sum(double(im1rgb), 3) / 3 / 255;
-% im2 = sum(double(im2rgb), 3) / 3 / 255;
-% 
-% % show images
-% figure;
-% subplot(1,2,1); imshow(im1rgb); axis image; title('Image 1');
-% subplot(1,2,2); imshow(im2rgb); axis image; title('Image 2');
-% 
-% 
-% %% Compute SIFT keypoints
-% 
-% % (make sure that the sift folder provided in lab2 is on the path)
-% 
-% [points_1, desc_1] = sift(im1, 'Threshold', 0.01);
-% [points_2, desc_2] = sift(im2, 'Threshold', 0.01);
-% 
-% %% Match SIFT keypoints between a and b
-% matches = siftmatch(desc_1, desc_2);
-% figure;
-% plotmatches(im1, im2, points_1(1:2,:), points_2(1:2,:), matches, 'Stacking', 'v');
-% 
-% % p1 and p2 contain the homogeneous coordinates of the matches
-% p1 = [points_1(1:2, matches(1,:)); ones(1, length(matches))];
-% p2 = [points_2(1:2, matches(2,:)); ones(1, length(matches))];
-% 
-% % ToDo: create this function (you can use as a basis 'ransac_homography_adaptive_loop.m')
-% [F, inliers] = ransac_fundamental_matrix(p1, p2, 2.0); 
-% 
-% % show inliers
-% figure;
-% plotmatches(im1, im2, points_1(1:2,:), points_2(1:2,:), matches(:,inliers), 'Stacking', 'v');
-% title('Inliers');
-% 
-% vgg_gui_F(im1rgb, im2rgb, F');
-% 
-% 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% 2. Robustly fit fundamental matrix
+
+% Read images
+im1rgb = imread('Data/0000_s.png');
+im2rgb = imread('Data/0001_s.png');
+im1 = sum(double(im1rgb), 3) / 3 / 255;
+im2 = sum(double(im2rgb), 3) / 3 / 255;
+
+% show images
+figure;
+subplot(1,2,1); imshow(im1rgb); axis image; title('Image 1');
+subplot(1,2,2); imshow(im2rgb); axis image; title('Image 2');
+
+
+%% Compute SIFT keypoints
+
+% (make sure that the sift folder provided in lab2 is on the path)
+
+[points_1, desc_1] = sift(im1, 'Threshold', 0.01);
+[points_2, desc_2] = sift(im2, 'Threshold', 0.01);
+
+%% Match SIFT keypoints between a and b
+matches = siftmatch(desc_1, desc_2);
+figure;
+plotmatches(im1, im2, points_1(1:2,:), points_2(1:2,:), matches, 'Stacking', 'v');
+
+% p1 and p2 contain the homogeneous coordinates of the matches
+p1 = [points_1(1:2, matches(1,:)); ones(1, length(matches))];
+p2 = [points_2(1:2, matches(2,:)); ones(1, length(matches))];
+
+% ToDo: create this function (you can use as a basis 'ransac_homography_adaptive_loop.m')
+[F, inliers] = ransac_fundamental_matrix(p1, p2, 2.0); 
+
+% show inliers
+figure;
+plotmatches(im1, im2, points_1(1:2,:), points_2(1:2,:), matches(:,inliers), 'Stacking', 'v');
+title('Inliers');
+
+vgg_gui_F(im1rgb, im2rgb, F');
+
+
 % %% Plot some epipolar lines
 % 
 % l2 = ... % epipolar lines in image 2 % ToDo
@@ -108,8 +108,8 @@ F_es / norm(F_es)
 % 
 % plot(p2(1, m3), p2(2, m3), '+g');
 % plot_homog_line(l2(:, m3));
-% 
-% 
+
+
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % %% 3. OPTIONAL: Photo-sequencing with aerial images
 % 
