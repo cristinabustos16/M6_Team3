@@ -155,7 +155,7 @@ subplot(2,2,4); imshow(im4rgb); axis image; title('Image 4');
 % matrices needed for computing the trajectory of point idx_car_I1
 % (use the SIFT keypoints previously computed)
 
-th_ransac = 2; % Threshold for Ransac.
+th_ransac = 2.; % Threshold for Ransac.
 
 % Fundamental matrix between frames 1 and 2:
 matches = siftmatch(desc_1, desc_2);
@@ -186,18 +186,18 @@ idx_car_I3 = find_most_similar_point(desc_1(:,idx_car_I1), desc_3); % ToDo: iden
 idx_car_I4 = find_most_similar_point(desc_1(:,idx_car_I1), desc_4); % ToDo: identify the corresponding point of idx_car_I1 in image 4
 
 % Show the points found, to check they are right:
-% subplot(2,2,1)
-% hold on
-% plot(points_1(1, idx_car_I1), points_1(2, idx_car_I1), '+g');
-% subplot(2,2,2)
-% hold on
-% plot(points_2(1, idx_car_I2), points_2(2, idx_car_I2), '+g');
-% subplot(2,2,3)
-% hold on
-% plot(points_3(1, idx_car_I3), points_3(2, idx_car_I3), '+g');
-% subplot(2,2,4)
-% hold on
-% plot(points_4(1, idx_car_I4), points_4(2, idx_car_I4), '+g');
+subplot(2,2,1)
+hold on
+plot(points_1(1, idx_car_I1), points_1(2, idx_car_I1), '+g');
+subplot(2,2,2)
+hold on
+plot(points_2(1, idx_car_I2), points_2(2, idx_car_I2), '+g');
+subplot(2,2,3)
+hold on
+plot(points_3(1, idx_car_I3), points_3(2, idx_car_I3), '+g');
+subplot(2,2,4)
+hold on
+plot(points_4(1, idx_car_I4), points_4(2, idx_car_I4), '+g');
 
 % coordinates (in image 1) of the keypoint idx_car_I1 (point in a van). 
 % point1_1 is the projection of a 3D point in the 3D trajectory of the van
