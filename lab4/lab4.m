@@ -2,7 +2,7 @@
 %% Lab 4: Reconstruction from two views (knowing internal camera parameters) 
 % (optional: depth computation)
 
-addpath('sift'); % ToDo: change 'sift' to the correct path where you have the sift functions
+addpath('../lab2/sift'); % ToDo: change 'sift' to the correct path where you have the sift functions
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% 1. Triangulation
@@ -93,18 +93,43 @@ K = H * K;
 
 
 % ToDo: Compute the Essential matrix from the Fundamental matrix
-E = ...
+% lecture 5-6 slide 36
+% F = K_p^(-T) * E * K^(-1)
+% Assume K_p = K
+E = K' * F * K;
 
+% lecture 5-6 slide 30 to 34
 
 % ToDo: write the camera projection matrix for the first camera
-P1 = ...
+P1 = [eye(3,3) zeros(3,1)]; %Assume extrinsics of first camera are P = [ I | 0 ] with Essential matrix -- slide 31
 
+% lecture 5-6 slide 30 to 34
+[U, ~, V] = svd(E);
+D = [1 0 0; 0 1 0; 0 0 0]; % rank 2
+
+W = [0 -1 0; 1 0 0; 0 0 1];
+Z = [0 1 0; -1 0 0; 0 0 0];
+
+%factorizations E = SR1 or E = SR2 
+S = U * Z * U'; %skew simetric
+
+R1 = U * W * V';
+if det(R1) < 0
+     R1 = -R1;
+end
+
+R2 = U * W' * V';
+if det(R2) < 0
+     R2 = -R2;
+end
+
+u3 = U(:,end);
 % ToDo: write the four possible matrices for the second camera
 Pc2 = {};
-Pc2{1} = ...
-Pc2{2} = ...
-Pc2{3} = ...
-Pc2{4} = ...
+Pc2{1} = [R1 u3];
+Pc2{2} = [R1 -u3];
+Pc2{3} = [R2 u3];
+Pc2{4} = [R2 -u3];
 
 % HINT: You may get improper rotations; in that case you need to change
 %       their sign.
@@ -154,6 +179,14 @@ axis equal;
 % ToDo: compute the reprojection errors
 %       plot the histogram of reprojection errors, and
 %       plot the mean reprojection error
+
+
+%%%% Cris: I suppose it's this ---> 
+% x_hat = P1 * X;
+% xp_hat = P2 * X;
+%lecture 7 slide 11
+%book pag 97
+% reproj_error = (x1(1,:)-x_hat(1,:)).^2 + (x1(2,:)-x_hat(2,:)).^2 + (x2(1,:)-xp_hat(1,:)).^2 + (x2(2,:)-xp_hat(2,:)).^2
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% 3. Depth map computation with local methods (SSD)
