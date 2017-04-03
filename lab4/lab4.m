@@ -124,6 +124,7 @@ if det(R2) < 0
 end
 
 u3 = U(:,end);
+
 % ToDo: write the four possible matrices for the second camera
 Pc2 = {};
 Pc2{1} = [R1 u3];
@@ -149,7 +150,18 @@ plot_camera(Pc2{4},w,h);
 
 %% Reconstruct structure
 % ToDo: Choose a second camera candidate by triangulating a match.
-P2 = ...
+% For each matrix, project point in the two cameras and it must be positive in the 3rd dimension
+match = null;
+for i=1:4
+    triangulation = triangulate(x1(:,1), x2(:,1), P1, Pc2{i}, [w h]);
+    projection1 = P1 * triangulation;
+    projection2 = P2 * triangulation;
+    if (projection1(3) >= 0) && (projection2(3) >= 0)
+        match = i;
+    end
+end
+
+P2 = Pc2{match};
 
 % Triangulate all matches.
 N = size(x1,2);
