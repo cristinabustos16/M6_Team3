@@ -29,6 +29,7 @@ for i = start : height - final
     for j = start : width - final
         cost_ssd = inf;
         cost_ncc = -inf;
+        cost_bil = inf;
         
         block_left = left_image(i-window_half_1:i+window_half_2,j-window_half_1:j+window_half_2);
         
@@ -52,6 +53,33 @@ for i = start : height - final
                     current_cost = sum(sum( (block_left - I1).*(block_right - I2) )) / (sigmaI1*sigmaI2);
                     if current_cost > cost_ncc
                         cost_ncc = current_cost;
+                        disparity_map(i,j) = disp;
+                    end
+                elseif strcmp(matching_cost, 'BILATERAL')
+                    %paper values
+                    gammac = 5;
+                    gammap =17.5;
+                    T = 10;
+                    center = ceil(window_size/2);
+                    I1 = block_left;
+                    I2 = block_right;
+                    I1_center = I1(center,center);
+                    I2_center = I2(center,center);
+                    num = 0;
+                    den = 0;
+                    for k = 1:window_size
+                        for l = 1:window_size
+                            dist = sqrt((k-center)^2 + (l-center)^2); 
+                            wI1 = exp( - (abs(I1(k,l)-I1_center)/gammac) - (dist/gammap));
+                            wI2 = exp( - (abs(I2(k,l)-I2_center)/gammac) - (dist/gammap));
+                            c = min(I1_center - I2_center,T);
+                            num = num + wI1*wI2*c;
+                            den = den + wI1*wI2;
+                        end
+                    end
+                    current_cost = num/den;
+                    if current_cost < cost_bil
+                        cost_bil = current_cost;
                         disparity_map(i,j) = disp;
                     end
                 end
