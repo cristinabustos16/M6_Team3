@@ -258,10 +258,10 @@ left_image = rgb2gray(imread('Data/scene1.row3.col4.ppm'));
 right_image = rgb2gray(imread('Data/scene1.row3.col3.ppm'));
 minimum_disparity = 0;
 maximum_disparity = 16;
-window_size = 3;
+window_size = 9;
 
 disparity = stereo_computation(double(left_image), double(right_image), ... 
-    minimum_disparity, maximum_disparity, window_size, 'SSD');
+    minimum_disparity, maximum_disparity, window_size, 'NCC');
 
 figure;
 imshow(disparity,[minimum_disparity maximum_disparity]);
@@ -283,6 +283,20 @@ imshow(disparity,[minimum_disparity maximum_disparity]);
 % Test the functions implemented in the previous section with the facade
 % images. Try different matching costs and window sizes and comment the
 % results.
+
+
+left_image = rgb2gray(imread('Data/0001_rectified_s.png'));
+right_image = rgb2gray(imread('Data/0002_rectified_s.png'));
+minimum_disparity = 0;
+maximum_disparity = 16;
+window_size = 3;
+
+disparity = stereo_computation(double(left_image), double(right_image), ... 
+    minimum_disparity, maximum_disparity, window_size, 'SSD');
+
+figure;
+imshow(disparity,[minimum_disparity maximum_disparity]);
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% 6. OPTIONAL: Bilateral weights

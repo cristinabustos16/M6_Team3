@@ -39,17 +39,17 @@ for i = start : height - final
                                         j-window_half_1+disp : j+window_half_2+disp);%movement only in x-axis
                 
                 if strcmp(matching_cost, 'SSD')
-                    current_cost = sum(sum((block_left-block_right).^2));
+                    current_cost = sum(sum((block_left-block_right).^2))/(window_size^2);
                     if current_cost < cost_ssd
                         cost_ssd = current_cost;
                         disparity_map(i,j) = disp;
                     end
                 elseif strcmp(matching_cost, 'NCC')
-                    I1 = sum(sum(block_left));
-                    I2 = sum(sum(block_right));
+                    I1 = sum(sum(block_left))./(window_size^2);
+                    I2 = sum(sum(block_right))./(window_size^2);
                     sigmaI1 = sqrt(sum(sum((block_left - I1).^2)));
                     sigmaI2 = sqrt(sum(sum((block_right - I2).^2)));
-                    current_cost = sum(sum( (block_left - I1)*(block_right - I2) )) / (sigmaI1*sigmaI2);
+                    current_cost = sum(sum( (block_left - I1).*(block_right - I2) )) / (sigmaI1*sigmaI2);
                     if current_cost > cost_ncc
                         cost_ncc = current_cost;
                         disparity_map(i,j) = disp;
