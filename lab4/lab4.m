@@ -261,7 +261,7 @@ maximum_disparity = 16;
 window_size = 9;
 
 disparity = stereo_computation(double(left_image), double(right_image), ... 
-    minimum_disparity, maximum_disparity, window_size, 'NCC');
+    minimum_disparity, maximum_disparity, window_size, 'SSD');
 
 figure;
 imshow(disparity,[minimum_disparity maximum_disparity]);
@@ -274,6 +274,17 @@ imshow(disparity,[minimum_disparity maximum_disparity]);
 %
 % Evaluate the results changing the window size (e.g. 3x3, 9x9, 20x20,
 % 30x30) and the matching cost. Comment the results.
+left_image = rgb2gray(imread('Data/scene1.row3.col4.ppm'));
+right_image = rgb2gray(imread('Data/scene1.row3.col3.ppm'));
+minimum_disparity = 0;
+maximum_disparity = 16;
+window_size = 9;
+
+disparity = stereo_computation(double(left_image), double(right_image), ... 
+    minimum_disparity, maximum_disparity, window_size, 'NCC');
+
+figure;
+imshow(disparity,[minimum_disparity maximum_disparity]);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% 5. Depth map computation with local methods
