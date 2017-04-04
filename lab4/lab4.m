@@ -151,7 +151,7 @@ plot_camera(Pc2{4},w,h);
 %% Reconstruct structure
 % ToDo: Choose a second camera candidate by triangulating a match.
 % For each matrix, project point in the two cameras and it must be positive in the 3rd dimension
-match = null;
+match = 1;
 for i=1:4
     triangulation = triangulate(x1(:,1), x2(:,1), P1, Pc2{i}, [w h]);
     projection1 = P1 * triangulation;
@@ -226,6 +226,17 @@ axis equal;
 % Note 1: Use grayscale images
 % Note 2: Use 0 as minimum disparity and 16 as the the maximum one.
 
+left_image = rgb2gray(imread('Data/scene1.row3.col4.ppm'));
+right_image = rgb2gray(imread('Data/scene1.row3.col3.ppm'));
+minimum_disparity = 0;
+maximum_disparity = 16;
+window_size = 3;
+
+disparity = stereo_computation(double(left_image), double(right_image), ... 
+    minimum_disparity, maximum_disparity, window_size, 'SSD');
+
+figure;
+imshow(disparity,[minimum_disparity maximum_disparity]);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% 4. OPTIONAL: Depth map computation with local methods (NCC)
