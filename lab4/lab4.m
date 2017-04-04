@@ -320,6 +320,17 @@ imshow(disparity,[minimum_disparity maximum_disparity]);
 %
 % Note: Use grayscale images (the paper uses color images)
 
+left_image = rgb2gray(imread('Data/scene1.row3.col4.ppm'));
+right_image = rgb2gray(imread('Data/scene1.row3.col3.ppm'));
+minimum_disparity = 0;
+maximum_disparity = 16;
+window_size = 9;
+
+disparity = stereo_computation(double(left_image), double(right_image), ... 
+    minimum_disparity, maximum_disparity, window_size, 'BILATERAL');
+
+figure;
+imshow(disparity,[minimum_disparity maximum_disparity]);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% 7. OPTIONAL:  Stereo computation with Belief Propagation
 
