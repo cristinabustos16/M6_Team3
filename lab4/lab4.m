@@ -161,7 +161,7 @@ for i=1:4
     X1_hom = triangulate(x1(:,idx_point), x2(:,idx_point), P1, Pc2{i}, [w h]);
     % Convert to Euclidean coordinates:
     X1_euc = euclid(X1_hom);
-    % Express X1 in the coordinates system of camera 2:
+    % Express X1 in the coordinates system of camera 2 (classes 5-6, slide 23):
     aux = inv(K) * Pc2{i};
     R = aux(:,1:3);
     T = aux(:,4);
@@ -206,12 +206,27 @@ axis equal;
 %       plot the mean reprojection error
 
 
-%%%% Cris: I suppose it's this ---> 
-% x_hat = P1 * X;
-% xp_hat = P2 * X;
-%lecture 7 slide 11
-%book pag 97
-% reproj_error = (x1(1,:)-x_hat(1,:)).^2 + (x1(2,:)-x_hat(2,:)).^2 + (x2(1,:)-xp_hat(1,:)).^2 + (x2(2,:)-xp_hat(2,:)).^2
+% 3D points projected onto camera 1, and transformed to euclidean coordinates:
+x1_hat = euclid(P1 * X);
+% 3D points projected onto camera 2, and transformed to euclidean coordinates:
+x2_hat = euclid(P2 * X);
+
+% Loop way:
+% reproj_error = zeros(1,size(x1,2));
+% for i = 1:size(x1,2)
+%     reproj_error(i) = norm(x1_hat(:,i) - x1(:,i))^2 + norm(x2_hat(:,i) - x2(:,i))^2;
+% end
+
+% Vectorized way:
+reproj_error = (x1_hat(1,:) - x1(1,:)).^2 + (x1_hat(2,:) - x1(2,:)).^2 + ...
+                (x2_hat(1,:) - x2(1,:)).^2 + (x2_hat(2,:) - x2(2,:)).^2;
+
+% Total error:
+fprintf('Total reprojection error: %f\n', sum(reproj_error))
+fprintf('Mean reprojection error: %f\n', mean(reproj_error))
+
+% Plot histogram:
+hist(reproj_error)
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% 3. Depth map computation with local methods (SSD)
