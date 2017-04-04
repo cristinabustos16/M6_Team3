@@ -101,7 +101,8 @@ E = K' * F * K;
 % lecture 5-6 slide 30 to 34
 
 % ToDo: write the camera projection matrix for the first camera
-P1 = [eye(3,3) zeros(3,1)]; %Assume extrinsics of first camera are P = [ I | 0 ] with Essential matrix -- slide 31
+P1 = K * [eye(3,3) zeros(3,1)]; %Assume extrinsics of first camera are P = [ I | 0 ] with Essential matrix -- slide 31
+% P1 = [eye(3,3) zeros(3,1)]; %Assume extrinsics of first camera are P = [ I | 0 ] with Essential matrix -- slide 31
 
 % lecture 5-6 slide 30 to 34
 [U, ~, V] = svd(E);
@@ -127,10 +128,10 @@ u3 = U(:,end);
 
 % ToDo: write the four possible matrices for the second camera
 Pc2 = {};
-Pc2{1} = [R1 u3];
-Pc2{2} = [R1 -u3];
-Pc2{3} = [R2 u3];
-Pc2{4} = [R2 -u3];
+Pc2{1} = K * [R1 u3];
+Pc2{2} = K * [R1 -u3];
+Pc2{3} = K * [R2 u3];
+Pc2{4} = K * [R2 -u3];
 
 % HINT: You may get improper rotations; in that case you need to change
 %       their sign.
@@ -151,7 +152,7 @@ plot_camera(Pc2{4},w,h);
 %% Reconstruct structure
 % ToDo: Choose a second camera candidate by triangulating a match.
 % For each matrix, project point in the two cameras and it must be positive in the 3rd dimension
-idx_point = 500;
+idx_point = 1;
 match = 0;
 for i=1:4
     % Doing the triangulation, we obtain the homogeneous coordinates with
@@ -161,8 +162,9 @@ for i=1:4
     % Convert to Euclidean coordinates:
     X1_euc = euclid(X1_hom);
     % Express X1 in the coordinates system of camera 2:
-    R = Pc2{i}(:,1:3);
-    T = Pc2{i}(:,4);
+    aux = inv(K) * Pc2{i};
+    R = aux(:,1:3);
+    T = aux(:,4);
     X2_euc = R * X1_euc + T;
     % Check that the third coordinate of X in both references is positive:
     if(X1_euc(3) > 0 && X2_euc(3) > 0)
