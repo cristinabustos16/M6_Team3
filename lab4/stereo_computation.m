@@ -32,7 +32,7 @@ for i = start : height - final
         block_left = left_image(i-window_half_1:i+window_half_2,j-window_half_1:j+window_half_2);
         
         for disp = min_disparity:max_disparity
-            if(j+window_half_2+disp <= height) %img boundaries constraints
+            if(j+window_half_2+disp <= width)%height) %img boundaries constraints
                
                 block_right = right_image(i-window_half_1 : i+window_half_2, ...
                                         j-window_half_1+disp : j+window_half_2+disp);%movement only in x-axis
