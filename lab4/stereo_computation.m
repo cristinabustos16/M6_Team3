@@ -27,7 +27,8 @@ final = window_half_2;
 
 for i = start : height - final
     for j = start : width - final
-        cost = inf;
+        cost_ssd = inf;
+        cost_ncc = -inf;
         
         block_left = left_image(i-window_half_1:i+window_half_2,j-window_half_1:j+window_half_2);
         
@@ -39,12 +40,20 @@ for i = start : height - final
                 
                 if strcmp(matching_cost, 'SSD')
                     current_cost = sum(sum((block_left-block_right).^2));
-                    if current_cost < cost
-                        cost = current_cost;
+                    if current_cost < cost_ssd
+                        cost_ssd = current_cost;
                         disparity_map(i,j) = disp;
                     end
-                else strcmp(matching_cost, 'NCC')
-                    %TODO
+                elseif strcmp(matching_cost, 'NCC')
+                    I1 = sum(sum(block_left));
+                    I2 = sum(sum(block_right));
+                    sigmaI1 = sqrt(sum(sum((block_left - I1).^2)));
+                    sigmaI2 = sqrt(sum(sum((block_right - I2).^2)));
+                    current_cost = sum(sum( (block_left - I1)*(block_right - I2) )) / (sigmaI1*sigmaI2);
+                    if current_cost > cost_ncc
+                        cost_ncc = current_cost;
+                        disparity_map(i,j) = disp;
+                    end
                 end
             end
         end
