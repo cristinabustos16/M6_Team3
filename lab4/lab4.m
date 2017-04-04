@@ -151,14 +151,15 @@ plot_camera(Pc2{4},w,h);
 %% Reconstruct structure
 % ToDo: Choose a second camera candidate by triangulating a match.
 % For each matrix, project point in the two cameras and it must be positive in the 3rd dimension
+idx_point = 500;
 match = 0;
 for i=1:4
     % Doing the triangulation, we obtain the homogeneous coordinates with
     % respecto to the first camera (we are assuming its projection matrix
     % is P = [I|0].
-    X1_hom = triangulate(x1(:,1), x2(:,1), P1, Pc2{i}, [w h]);
+    X1_hom = triangulate(x1(:,idx_point), x2(:,idx_point), P1, Pc2{i}, [w h]);
     % Convert to Euclidean coordinates:
-    X1_euc = X1_hom(1:3) / X1_hom(4);
+    X1_euc = euclid(X1_hom);
     % Express X1 in the coordinates system of camera 2:
     R = Pc2{i}(:,1:3);
     T = Pc2{i}(:,4);
