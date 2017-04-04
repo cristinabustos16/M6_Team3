@@ -151,16 +151,26 @@ plot_camera(Pc2{4},w,h);
 %% Reconstruct structure
 % ToDo: Choose a second camera candidate by triangulating a match.
 % For each matrix, project point in the two cameras and it must be positive in the 3rd dimension
-match = 1;
+match = 0;
 for i=1:4
-    triangulation = triangulate(x1(:,1), x2(:,1), P1, Pc2{i}, [w h]);
-    projection1 = P1 * triangulation;
-    projection2 = P2 * triangulation;
-    if (projection1(3) >= 0) && (projection2(3) >= 0)
+    % Doing the triangulation, we obtain the homogeneous coordinates with
+    % respecto to the first camera (we are assuming its projection matrix
+    % is P = [I|0].
+    X1_hom = triangulate(x1(:,1), x2(:,1), P1, Pc2{i}, [w h]);
+    % Convert to Euclidean coordinates:
+    X1_euc = X1_hom(1:3) / X1_hom(4);
+    % Express X1 in the coordinates system of camera 2:
+    R = Pc2{i}(:,1:3);
+    T = Pc2{i}(:,4);
+    X2_euc = R * X1_euc + T;
+    % Check that the third coordinate of X in both references is positive:
+    if(X1_euc(3) > 0 && X2_euc(3) > 0)
         match = i;
     end
 end
-
+if(match == 0)
+    error('Could not select appropriate matrix for second camera.')
+end
 P2 = Pc2{match};
 
 % Triangulate all matches.
