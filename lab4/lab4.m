@@ -226,6 +226,7 @@ fprintf('Total reprojection error: %f\n', sum(reproj_error))
 fprintf('Mean reprojection error: %f\n', mean(reproj_error))
 
 % Plot histogram:
+figure()
 hist(reproj_error)
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

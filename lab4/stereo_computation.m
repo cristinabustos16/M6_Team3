@@ -72,7 +72,7 @@ for i = start : height - final
                             dist = sqrt((k-center)^2 + (l-center)^2); 
                             wI1 = exp( - (abs(I1(k,l)-I1_center)/gammac) - (dist/gammap));
                             wI2 = exp( - (abs(I2(k,l)-I2_center)/gammac) - (dist/gammap));
-                            c = min(I1_center - I2_center,T);
+                            c = min(abs(I1(k,l) - I2(k,l)),T);
                             num = num + wI1*wI2*c;
                             den = den + wI1*wI2;
                         end
