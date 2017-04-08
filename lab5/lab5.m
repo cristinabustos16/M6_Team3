@@ -2,7 +2,7 @@
 %% Lab 5: Reconstruction from uncalibrated viewas
 
 
-addpath('sift'); % ToDo: change 'sift' to the correct path where you have the sift functions
+addpath('../lab2/sift'); % ToDo: change 'sift' to the correct path where you have the sift functions
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
