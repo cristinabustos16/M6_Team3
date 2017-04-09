@@ -245,6 +245,29 @@ axis equal
 % ToDo: create the function 'vanishing_point' that computes the vanishing
 % point formed by the line that joins points xo1 and xf1 and the line 
 % that joins points x02 and xf2
+% 
+% lpmayos note: lecture 9a
+    % There are different methods for autocalibration (process of determining 
+    % the internal camera parameters directly from multiple uncalibrated images). 
+    % We will see the stratified methods which involve two steps:
+    %   • Affine reconstruction: it finds the plane at infinity
+    %   • Metric reconstruction: it finds the image of the absolute conic ω = K −T K −1 (and thus the internal parameters)
+    % 
+    % We need to find the homography:
+    %       Ha←p = [I 0; pT 1]
+    %       The essence of the affine reconstruction is then to locate the plane at 
+    %       infinity in the projective reconstruction frame.
+    %       By applying Ha←p we will map p to Π∞ = (0,0,0,1)T and we will recover te paralellism.
+    % How do we identify p?  (slide 22)
+    %       As every plane, the plane at infinity is determined by three points on it.
+    % since ΠTX_i = 0, i = 1,2,3, we have: 
+    %       X_1^T
+    %       X_2^T  Π = 0 --> AΠ = 0  where A is a 3x4 matrix
+    %       X_3^T
+    % If the three points are in general position (not on the same line), they
+    % provide linearly indep. eq. and the matrix they form is rank 3.
+    % −→ Then Π is obtained uniquely (up to scale) as the 1-dimensional right null space of A.
+
 %
 % [v1] = vanishing_point(xo1, xf1, xo2, xf2)
 
@@ -260,6 +283,27 @@ v3p = vanishing_point(x2(:,1),x2(:,2),x2(:,4),x2(:,3));
 % ToDo: use the vanishing points to compute the matrix Hp that 
 %       upgrades the projective reconstruction to an affine reconstruction
 
+% .............................
+p1 = Pproj(1:3,:);  % camera 1
+p2 = Pproj(4:6,:);  % camera 2
+
+A = [triangulate(euclid(v1), euclid(v1p), p1, p2, [w h])'; ...
+     triangulate(euclid(v2), euclid(v2p), p1, p2, [w h])'; ...
+     triangulate(euclid(v3), euclid(v3p), p1, p2, [w h])'];
+
+% Then Π is obtained uniquely (up to scale) as the 1-dimensional right null space of A.
+% We can compute the right null space of A with the svd (ref: https://cseweb.ucsd.edu/classes/wi15/cse252B-a/nullspace.pdf)
+% ... i-th column of V are the corresponding right singular vector of A.
+% ... The rank r of A is the number of nonzero singular values. 
+% ... The (right) null space of A is the columns of V corresponding to singular values equal to zero.
+
+rightNullSpace = null(A);  % Z = null(A) is an orthonormal basis for the null space of A obtained from the singular value decomposition.
+H = [euclid(aux)' 1];  % we could just divide each element by H(4)
+% equivalent to [U, D, V] = svd(A); H = V(:, end);
+Hp = eye(4);
+Hp(end,:) = H;
+
+% .............................
 
 %% check results
 
