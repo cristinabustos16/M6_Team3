@@ -18,14 +18,18 @@ function [Pproj, Xproj] = factorization_method(x)
     tol_d = 0.1;
 
     % Some numbers:
-    Ncam = length(x);
+    Ncams = length(x);
     Npoints = size(x{1},2);
 
     % Normalize points:
-    % TODO
+    x_hat = cell(1,Ncams);
+    Harray = cell(1,Ncams);
+    for i = 1:Ncams
+        [x_hat{i}, Harray{i}] = normalise2dpts(x{i});
+    end
 
     % Initialize lambdas:
-    lambda = ones(Ncam, Npoints);
+    lambda = ones(Ncams, Npoints);
     
     % Initialize mean distance between original and projected 2D poitns:
     d = Inf;
@@ -38,7 +42,7 @@ function [Pproj, Xproj] = factorization_method(x)
         while(reescale)
             lambda_old = lambda;
             % Reescale rows:
-            for i = 1:Ncam
+            for i = 1:Ncams
                 lambda(i,:) = lambda(i,:) / norm(lambda(i,:));
             end
             % Reescale columns:
@@ -54,26 +58,27 @@ function [Pproj, Xproj] = factorization_method(x)
         % Build measurement matrix:
         M = zeros(3*Ncams, Npoints);
         for i = 1:Ncams
-            M(3*i-2,:) = lambda(i,:) .* x{i}(1,:);
-            M(3*i-1,:) = lambda(i,:) .* x{i}(2,:);
-            M(3*i,:)   = lambda(i,:) .* x{i}(3,:);
+            M(3*i-2,:) = lambda(i,:) .* x_hat{i}(1,:);
+            M(3*i-1,:) = lambda(i,:) .* x_hat{i}(2,:);
+            M(3*i,:)   = lambda(i,:) .* x_hat{i}(3,:);
         end
         
         % Singular Value Decomposition of M:
         [U,D,V] = svd(M);
         
         % Camera projection matrices and homogenous 3D points:
-        Pproj = U * D(:,1:4);
+        Pproj_hat = U * D(:,1:4);
         Xproj = V(:,1:4)';
         
         % Compute distance between original 2D points and projected ones:
         d_old = d;
         d = 0;
         for i = 1:Ncams
-            x_proj_2d = Pproj((3*i-2):(3*i),:) * Xproj;
+            x_proj_2d = Pproj_hat((3*i-2):(3*i),:) * Xproj;
             x_proj_euc = euclid(x_proj_2d);
+            x_orig_euc = euclid(x_hat{i});
             for j = 1:Npoints
-                d = d + norm(x{i}(:,j) - x_proj_euc(:,j))^2;
+                d = d + norm(x_orig_euc(:,j) - x_proj_euc(:,j))^2;
             end
         end
         % Divide to get the mean distance (although it does not affect the
@@ -87,7 +92,9 @@ function [Pproj, Xproj] = factorization_method(x)
     end
     
     % Unnormalize:
-    % TODO
+    for i = 1:Ncams
+        Pproj((3*i-2):(3*i),:) = inv(Harray{i}) * Pproj_hat((3*i-2):(3*i),:);
+    end
     
     % Triangulate and resection ???
 
