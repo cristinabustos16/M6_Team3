@@ -291,6 +291,7 @@ A = [triangulate(euclid(v1), euclid(v1p), p1, p2, [w h])'; ...
      triangulate(euclid(v2), euclid(v2p), p1, p2, [w h])'; ...
      triangulate(euclid(v3), euclid(v3p), p1, p2, [w h])'];
 
+% lpmayos note
 % Then Π is obtained uniquely (up to scale) as the 1-dimensional right null space of A.
 % We can compute the right null space of A with the svd (ref: https://cseweb.ucsd.edu/classes/wi15/cse252B-a/nullspace.pdf)
 % ... i-th column of V are the corresponding right singular vector of A.
@@ -298,7 +299,7 @@ A = [triangulate(euclid(v1), euclid(v1p), p1, p2, [w h])'; ...
 % ... The (right) null space of A is the columns of V corresponding to singular values equal to zero.
 
 rightNullSpace = null(A);  % Z = null(A) is an orthonormal basis for the null space of A obtained from the singular value decomposition.
-H = [euclid(aux)' 1];  % we could just divide each element by H(4)
+H = [euclid(rightNullSpace)' 1];  % we could just divide each element by H(4)
 % equivalent to [U, D, V] = svd(A); H = V(:, end);
 Hp = eye(4);
 Hp(end,:) = H;
@@ -358,6 +359,16 @@ v1 = vanishing_point(x1(:,2),x1(:,5),x1(:,3),x1(:,6));
 v2 = vanishing_point(x1(:,1),x1(:,2),x1(:,3),x1(:,4));
 v3 = vanishing_point(x1(:,1),x1(:,4),x1(:,2),x1(:,3));
 
+% lpmayos note: lecture 9a, slide 29 (book page 478 / pdf page 496)
+% lpmayos note: see algorithm 19.2 on book page 479 / pdf page 497
+%       Metric rectification: Determine the camera matrix K from the Cholesky 
+%       decomposition ω = (KK^T)^−1 . Then a metric reconstruction is obtained
+%       as {Pi H_P H_A, (H_P H_A )−1 X_j } with H_A = [K 0; 0^T 1]
+
+Ha = zeros(3,3);
+Ha(1:2, 1:2) = K;
+Ha(3,3) = 1;
+
 %% check results
 
 Xa = euclid(Ha*Hp*Xproj);
@@ -399,92 +410,92 @@ plot3([X6(1) X8(1)], [X6(2) X8(2)], [X6(3) X8(3)]);
 axis vis3d
 axis equal
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% 4. Projective reconstruction (real data)
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% %% 4. Projective reconstruction (real data)
 
-%% read images
-Irgb{1} = double(imread('Data/0000_s.png'))/255;
-Irgb{2} = double(imread('Data/0001_s.png'))/255;
+% %% read images
+% Irgb{1} = double(imread('Data/0000_s.png'))/255;
+% Irgb{2} = double(imread('Data/0001_s.png'))/255;
 
-I{1} = sum(Irgb{1}, 3) / 3; 
-I{2} = sum(Irgb{2}, 3) / 3;
+% I{1} = sum(Irgb{1}, 3) / 3; 
+% I{2} = sum(Irgb{2}, 3) / 3;
 
-Ncam = length(I);
+% Ncam = length(I);
 
-% ToDo: compute a projective reconstruction using the factorization method
+% % ToDo: compute a projective reconstruction using the factorization method
 
-% ToDo: show the data points (image correspondences) and the projected
-% points (of the reconstructed 3D points) in images 1 and 2. Reuse the code
-% in section 'Check projected points' (synthetic experiment).
+% % ToDo: show the data points (image correspondences) and the projected
+% % points (of the reconstructed 3D points) in images 1 and 2. Reuse the code
+% % in section 'Check projected points' (synthetic experiment).
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% 5. Affine reconstruction (real data)
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% %% 5. Affine reconstruction (real data)
 
-% ToDo: compute the matrix Hp that updates the projective reconstruction
-% to an affine one
-%
-% You may use the vanishing points given by function 'detect_vps' that 
-% implements the method presented in Lezama et al. CVPR 2014
-% (http://dev.ipol.im/~jlezama/vanishing_points/)
+% % ToDo: compute the matrix Hp that updates the projective reconstruction
+% % to an affine one
+% %
+% % You may use the vanishing points given by function 'detect_vps' that 
+% % implements the method presented in Lezama et al. CVPR 2014
+% % (http://dev.ipol.im/~jlezama/vanishing_points/)
 
-% This is an example on how to obtain the vanishing points (VPs) from three
-% orthogonal lines in image 1
+% % This is an example on how to obtain the vanishing points (VPs) from three
+% % orthogonal lines in image 1
 
-img_in =  'Data/0000_s.png'; % input image
-folder_out = '.'; % output folder
-manhattan = 1;
-acceleration = 0;
-focal_ratio = 1;
-params.PRINT = 1;
-params.PLOT = 1;
-[horizon, VPs] = detect_vps(img_in, folder_out, manhattan, acceleration, focal_ratio, params);
+% img_in =  'Data/0000_s.png'; % input image
+% folder_out = '.'; % output folder
+% manhattan = 1;
+% acceleration = 0;
+% focal_ratio = 1;
+% params.PRINT = 1;
+% params.PLOT = 1;
+% [horizon, VPs] = detect_vps(img_in, folder_out, manhattan, acceleration, focal_ratio, params);
 
 
-%% Visualize the result
+% %% Visualize the result
 
-% x1m are the data points in image 1
-% Xm are the reconstructed 3D points (projective reconstruction)
+% % x1m are the data points in image 1
+% % Xm are the reconstructed 3D points (projective reconstruction)
 
-r = interp2(double(Irgb{1}(:,:,1)), x1m(1,:), x1m(2,:));
-g = interp2(double(Irgb{1}(:,:,2)), x1m(1,:), x1m(2,:));
-b = interp2(double(Irgb{1}(:,:,3)), x1m(1,:), x1m(2,:));
-Xe = euclid(Hp*Xm);
-figure; hold on;
-[w,h] = size(I{1});
-for i = 1:length(Xe)
-    scatter3(Xe(1,i), Xe(2,i), Xe(3,i), 2^2, [r(i) g(i) b(i)], 'filled');
-end;
-axis equal;
+% r = interp2(double(Irgb{1}(:,:,1)), x1m(1,:), x1m(2,:));
+% g = interp2(double(Irgb{1}(:,:,2)), x1m(1,:), x1m(2,:));
+% b = interp2(double(Irgb{1}(:,:,3)), x1m(1,:), x1m(2,:));
+% Xe = euclid(Hp*Xm);
+% figure; hold on;
+% [w,h] = size(I{1});
+% for i = 1:length(Xe)
+%     scatter3(Xe(1,i), Xe(2,i), Xe(3,i), 2^2, [r(i) g(i) b(i)], 'filled');
+% end;
+% axis equal;
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% 6. Metric reconstruction (real data)
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% %% 6. Metric reconstruction (real data)
 
-% ToDo: compute the matrix Ha that updates the affine reconstruction
-% to a metric one and visualize the result in 3D as in the previous section
+% % ToDo: compute the matrix Ha that updates the affine reconstruction
+% % to a metric one and visualize the result in 3D as in the previous section
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% 7. OPTIONAL: Projective reconstruction from two views
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% %% 7. OPTIONAL: Projective reconstruction from two views
 
-% ToDo: compute a projective reconstruction from the same two views 
-% by computing two possible projection matrices from the fundamental matrix
-% and one of the epipoles.
-% Then update the reconstruction to affine and metric as before (reuse the code).
+% % ToDo: compute a projective reconstruction from the same two views 
+% % by computing two possible projection matrices from the fundamental matrix
+% % and one of the epipoles.
+% % Then update the reconstruction to affine and metric as before (reuse the code).
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% 8. OPTIONAL: Projective reconstruction from more than two views
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% %% 8. OPTIONAL: Projective reconstruction from more than two views
 
-% ToDo: extend the function that computes the projective reconstruction 
-% with the factorization method to the case of three views. You may use 
-% the additional image '0002_s.png'
-% Then update the reconstruction to affine and metric.
-%
-% Any other improvement you may icorporate (add a 4th view,
-% incorporate new 3D points by triangulation, incorporate new views
-% by resectioning, better visualization of the result with another
-% software, ...)
+% % ToDo: extend the function that computes the projective reconstruction 
+% % with the factorization method to the case of three views. You may use 
+% % the additional image '0002_s.png'
+% % Then update the reconstruction to affine and metric.
+% %
+% % Any other improvement you may icorporate (add a 4th view,
+% % incorporate new 3D points by triangulation, incorporate new views
+% % by resectioning, better visualization of the result with another
+% % software, ...)
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% 9. OPTIONAL: Any other improvement you may icorporate 
-%
-%  (add a 4th view, incorporate new 3D points by triangulation, 
-%   apply any kind of processing on the point cloud, ...)
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% %% 9. OPTIONAL: Any other improvement you may icorporate 
+% %
+% %  (add a 4th view, incorporate new 3D points by triangulation, 
+% %   apply any kind of processing on the point cloud, ...)
