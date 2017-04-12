@@ -13,6 +13,8 @@ function [Pproj, Xproj] = factorization_method(x)
 %     - Xproj: 4*Npoints x 1 array with the homogeneous coordinates of the
 %     3D points.
 
+% lpmayos note: theory lecture 8 slide 50
+
     % Some parameters:
     tol_reescale = 0.1;
     tol_d = 0.1;
@@ -29,8 +31,21 @@ function [Pproj, Xproj] = factorization_method(x)
     end
 
     % Initialize lambdas:
+    % Note: initialiing to 1 it does not work!
     lambda = ones(Ncams, Npoints);
-    
+    for idx = 1:size(x, 2)
+        F{idx} = fundamental_matrix(x{idx}, x{1});
+        [U, D, V] = svd(F{idx});
+        e{idx} = V(:,3) / V(3,3);
+    end
+    for i = 1:size(x, 2)
+        for j = 1:size(x{1},2)
+            num = x{1}(:, j)'*F{i}*cross(e{i}, x{i}(:,j));
+            denom = norm(cross(e{i}, x{i}(:,j))).^2*lambda(1, j);
+            lambda(i,j) = num/denom;
+        end
+    end   
+
     % Initialize mean distance between original and projected 2D poitns:
     d = Inf;
     

@@ -200,6 +200,7 @@ Xaux(3,:) = Xproj(3,:)./Xproj(4,:);
 X=Xaux;
 
 figure;
+title('task 1: projective reconstruction');
 hold on;
 X1 = X(:,1); X2 = X(:,2); X3 = X(:,3); X4 = X(:,4);
 plot3([X1(1) X2(1)], [X1(2) X2(2)], [X1(3) X2(3)]);
@@ -310,6 +311,7 @@ Hp(end,:) = H;
 
 Xa = euclid(Hp*Xproj);
 figure;
+title('task 2 affine reconstruction');
 hold on;
 X1 = Xa(:,1); X2 = Xa(:,2); X3 = Xa(:,3); X4 = Xa(:,4);
 plot3([X1(1) X2(1)], [X1(2) X2(2)], [X1(3) X2(3)]);
@@ -386,12 +388,12 @@ A = [ u1a*v1a u1a*v2a+u2a*v1a u1a*v3a+u3a*v1a u2a*v2a u2a*v3a+u3a*v2a u3a*v3a; .
 
 % book 496: Algorithm 19.2 comes down to solving a homogeneous set of equations
 % of the form Ac = 0, where c represents w arranged as a 6-vector.
-% In matrix form: AωV = 0, where ωV = (ω11,ω12,ω13,ω22,ω23,ω33)T
+% In matrix form: A??V = 0, where ??V = (??11,??12,??13,??22,??23,??33)T
 
-% lpmayos: The solution ω_V is the null vector of A (slides 9a slide 35).
+% lpmayos: The solution ??_V is the null vector of A (slides 9a slide 35).
 wv = null(A);
 
-% lpmayos: The solution ω_V is the null vector of A (slides 9a slide 34).
+% lpmayos: slides 9a slide 34
 w = [ wv(1,1) wv(1,2) wv(1,3); ...
       wv(1,2) wv(2,2) wv(2,3); ...
       wv(1,3) wv(2,3) wv(3,3) ];
@@ -405,9 +407,10 @@ w = [ wv(1,1) wv(1,2) wv(1,3); ...
 % book alpg. 10.1 page pdf 295
 % camera in the affine reconstruction for which w is computed
 p1_a = p1 * inv(Hp);
-% M is the first 3 × 3 submatrix
+% p1_a = p1 * Hp;
+% M is the first 3 ?? 3 submatrix
 M = p1_a(1:3, 1:3);
-% A is obtained by Cholesky factorization from the equation AA^T = (M^T w M)^−1
+% A is obtained by Cholesky factorization from the equation AA^T = (M^T w M)^???1
 A = chol(inv(M' * w * M));
 % Homography to upgrade the affine reconstruction to a metric reconstruction
 Ha = [inv(A), [0, 0, 0]'; 0, 0, 0, 1];
