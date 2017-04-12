@@ -359,6 +359,13 @@ v1 = vanishing_point(x1(:,2),x1(:,5),x1(:,3),x1(:,6));
 v2 = vanishing_point(x1(:,1),x1(:,2),x1(:,3),x1(:,4));
 v3 = vanishing_point(x1(:,1),x1(:,4),x1(:,2),x1(:,3));
 
+
+% lpmayos note: see nice intro to metric reconstruction on book page 272 (pdf 290)
+
+% book pdf page 295 algorithm 10.1
+
+
+
 % lpmayos note: lecture 9a, slide 29 (book page 478 / pdf page 496)
 % lpmayos note: see algorithm 19.2 on book page 479 / pdf page 497
 %       Metric rectification: Determine the camera matrix K from the Cholesky 
@@ -375,18 +382,35 @@ A = [ u1a*v1a u1a*v2a+u2a*v1a u1a*v3a+u3a*v1a u2a*v2a u2a*v3a+u3a*v2a u3a*v3a; .
       u1a*z1a u1a*z2a+u2a*z1a u1a*z3a+u3a*z1a u2a*z2a u2a*z3a+u3a*z2a u3a*z3a; ...
       v1a*z1a v1a*z2a+v2a*z1a v1a*z3a+v3a*z1a v2a*z2a v2a*z3a+v3a*z2a v3a*z3a; ...
       0       1               0               0       0               0; ...
-      1       0               0               -1      0               0];
+      1       0               0               -1      0               0 ];
 
 % book 496: Algorithm 19.2 comes down to solving a homogeneous set of equations
 % of the form Ac = 0, where c represents w arranged as a 6-vector.
 % In matrix form: AωV = 0, where ωV = (ω11,ω12,ω13,ω22,ω23,ω33)T
 
 % lpmayos: The solution ω_V is the null vector of A (slides 9a slide 35).
-w = null(A);
-wv = [w(1,1); w(1,2); w(1,3); w(2,2); w(2,3); w(3,3)];
+wv = null(A);
 
-[U,D,V] = svd(A*wv);
-Ha = V(:, end);
+% lpmayos: The solution ω_V is the null vector of A (slides 9a slide 34).
+w = [ wv(1,1) wv(1,2) wv(1,3); ...
+      wv(1,2) wv(2,2) wv(2,3); ...
+      wv(1,3) wv(2,3) wv(3,3) ];
+
+% the camera is known to have zero skew, then w12 = 0
+% pixels are square, that is, zero skew and alpha_x = alpha_y , then: w11 = w22
+% w = [ wv(2,2) 0       wv(1,3); ...
+%       0       wv(2,2) wv(2,3); ...
+%       wv(1,3) wv(2,3) wv(3,3) ];
+
+% book alpg. 10.1 page pdf 295
+% camera in the affine reconstruction for which w is computed
+p1_a = p1 * inv(Hp);
+% M is the first 3 × 3 submatrix
+M = p1_a(1:3, 1:3);
+% A is obtained by Cholesky factorization from the equation AA^T = (M^T w M)^−1
+A = chol(inv(M' * w * M));
+% Homography to upgrade the affine reconstruction to a metric reconstruction
+Ha = [inv(A), [0, 0, 0]'; 0, 0, 0, 1];
 
 
 %% check results
