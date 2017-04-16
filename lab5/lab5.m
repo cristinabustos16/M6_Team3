@@ -3,7 +3,7 @@
 
 
 addpath('../lab2/sift'); % ToDo: change 'sift' to the correct path where you have the sift functions
-
+addpath('./vanishing_points_v0.4');
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% 0. Create synthetic data

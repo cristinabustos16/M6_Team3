@@ -178,7 +178,7 @@ double nfa(int n, int k, double p, double logNT)
   if( double_equal(term,0.0) )              /* the first term is almost zero */
     {
       if( (double) k > (double) n * p )     /* at begin or end of the tail?  */
-        return -log1term / M_LN10 - logNT;  /* end: use just the first term  */
+        return -log1term / 2.30258509299404568402 - logNT;  /* end: use just the first term  */
       else
         return -logNT;                      /* begin: the tail is roughly 1  */
     }
