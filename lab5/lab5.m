@@ -277,7 +277,7 @@ v1 = vanishing_point(x1(:,21),x1(:,22),x1(:,23),x1(:,24));
 v2 = vanishing_point(x1(:,21),x1(:,23),x1(:,22),x1(:,24));
 v3 = vanishing_point(x1(:,1),x1(:,2),x1(:,4),x1(:,3));
 
-v3(3) = -1.8190e-11; 
+% v3(3) = -1.8190e-11; 
 
 v1p = vanishing_point(x2(:,21),x2(:,22),x2(:,23),x2(:,24));
 v2p = vanishing_point(x2(:,21),x2(:,23),x2(:,22),x2(:,24));
@@ -376,30 +376,24 @@ v3 = vanishing_point(x1(:,1),x1(:,4),x1(:,2),x1(:,3));
 %       decomposition ?? = (KK^T)^???1 . Then a metric reconstruction is obtained
 %       as {Pi H_P H_A, (H_P H_A )???1 X_j } with H_A = [K 0; 0^T 1]
 
-
-% note: notation xxa, a added to differentiate matrix elements from vanishing points
-u1a = v1(1); u2a = v1(2); u3a = v1(3);
-v1a = v2(1); v2a = v2(2); v3a = v2(3);
-z1a = v3(1); z2a = v3(2); z3a = v3(3);
-
-A = [ u1a*v1a u1a*v2a+u2a*v1a u1a*v3a+u3a*v1a u2a*v2a u2a*v3a+u3a*v2a u3a*v3a; ...
-      u1a*z1a u1a*z2a+u2a*z1a u1a*z3a+u3a*z1a u2a*z2a u2a*z3a+u3a*z2a u3a*z3a; ...
-      v1a*z1a v1a*z2a+v2a*z1a v1a*z3a+v3a*z1a v2a*z2a v2a*z3a+v3a*z2a v3a*z3a; ...
-      0       1               0               0       0               0; ...
-      1       0               0               -1      0               0 ];
+A = [v1(1)*v2(1) v1(1)*v2(2) + v1(2)*v2(1) v1(1)*v2(3) + v1(3)*v2(1) v1(2)*v2(2) v1(2)*v2(3) + v1(3)*v2(2) v1(3)*v2(3);
+     v1(1)*v3(1) v1(1)*v3(2) + v1(2)*v3(1) v1(1)*v3(3) + v1(3)*v3(1) v1(2)*v3(2) v1(2)*v3(3) + v1(3)*v3(2) v1(3)*v3(3);
+     v2(1)*v3(1) v2(1)*v3(2) + v2(2)*v3(1) v2(1)*v3(3) + v2(3)*v3(1) v2(2)*v3(2) v2(2)*v3(3) + v2(3)*v3(2) v2(3)*v3(3);
+     0           1             0                         0           0           0;
+     1           0             0                         -1          0           0];
 
 % book 496: Algorithm 19.2 comes down to solving a homogeneous set of equations
 % of the form Ac = 0, where c represents w arranged as a 6-vector.
 % In matrix form: A??V = 0, where ??V = (??11,??12,??13,??22,??23,??33)T
 
 % lpmayos: The solution ??_V is the null vector of A (slides 9a slide 35).
-wv = null(A);
-wv = wv(:,end);
+[U, D, V] = svd(A);
+wv = V(:,end);
 
 % lpmayos: slides 9a slide 34
 omega = [ wv(1) wv(2) wv(3); ...
-      wv(2) wv(4) wv(5); ...
-      wv(3) wv(5) wv(6) ];
+          wv(2) wv(4) wv(5); ...
+          wv(3) wv(5) wv(6) ];
 
 % forcing w to be positive definite  
 % [vec,val]=eig(w);
@@ -430,6 +424,7 @@ Ha = [inv(A), [0, 0, 0]'; 0, 0, 0, 1];
 
 Xa = euclid(Ha*Hp*Xproj);
 figure;
+title('Task 3. Metric reconstruction with synthetic data');
 hold on;
 X1 = Xa(:,1); X2 = Xa(:,2); X3 = Xa(:,3); X4 = Xa(:,4);
 plot3([X1(1) X2(1)], [X1(2) X2(2)], [X1(3) X2(3)]);
