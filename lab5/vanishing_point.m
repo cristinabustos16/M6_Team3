@@ -3,7 +3,9 @@
 function [ v1 ] = vanishing_point(xo1, xf1, xo2, xf2)
 
     line1 = cross(xo1, xf1);
+    line1 = line1/line1(end);
     line2 = cross(xo2, xf2);
+    line2 = line2/line2(end);
     v1 = cross(line1, line2);
 
 end
