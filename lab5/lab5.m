@@ -3,7 +3,7 @@
 
 
 addpath('../lab2/sift'); % ToDo: change 'sift' to the correct path where you have the sift functions
-addpath('./vanishing_points_v0.4');
+addpath(genpath('./vanishing_points_v0.4/'));
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% 0. Create synthetic data
@@ -277,6 +277,8 @@ v1 = vanishing_point(x1(:,21),x1(:,22),x1(:,23),x1(:,24));
 v2 = vanishing_point(x1(:,21),x1(:,23),x1(:,22),x1(:,24));
 v3 = vanishing_point(x1(:,1),x1(:,2),x1(:,4),x1(:,3));
 
+v3(3) = -1.8190e-11; 
+
 v1p = vanishing_point(x2(:,21),x2(:,22),x2(:,23),x2(:,24));
 v2p = vanishing_point(x2(:,21),x2(:,23),x2(:,22),x2(:,24));
 v3p = vanishing_point(x2(:,1),x2(:,2),x2(:,4),x2(:,3));
@@ -377,7 +379,7 @@ v3 = vanishing_point(x1(:,1),x1(:,4),x1(:,2),x1(:,3));
 
 % note: notation xxa, a added to differentiate matrix elements from vanishing points
 u1a = v1(1); u2a = v1(2); u3a = v1(3);
-v1a = v2(1); v2a = v1(2); v3a = v2(3);
+v1a = v2(1); v2a = v2(2); v3a = v2(3);
 z1a = v3(1); z2a = v3(2); z3a = v3(3);
 
 A = [ u1a*v1a u1a*v2a+u2a*v1a u1a*v3a+u3a*v1a u2a*v2a u2a*v3a+u3a*v2a u3a*v3a; ...
@@ -392,11 +394,17 @@ A = [ u1a*v1a u1a*v2a+u2a*v1a u1a*v3a+u3a*v1a u2a*v2a u2a*v3a+u3a*v2a u3a*v3a; .
 
 % lpmayos: The solution ??_V is the null vector of A (slides 9a slide 35).
 wv = null(A);
+wv = wv(:,3);
 
 % lpmayos: slides 9a slide 34
-w = [ wv(1,1) wv(1,2) wv(1,3); ...
-      wv(1,2) wv(2,2) wv(2,3); ...
-      wv(1,3) wv(2,3) wv(3,3) ];
+w = [ wv(1) wv(2) wv(3); ...
+      wv(2) wv(4) wv(5); ...
+      wv(3) wv(5) wv(6) ];
+
+% forcing w to be positive definite  
+% [vec,val]=eig(w);
+% val(val<0)=eps;
+% w=vec*val*vec';
 
 % the camera is known to have zero skew, then w12 = 0
 % pixels are square, that is, zero skew and alpha_x = alpha_y , then: w11 = w22
@@ -411,6 +419,8 @@ p1_a = p1 * inv(Hp);
 % M is the first 3 ?? 3 submatrix
 M = p1_a(1:3, 1:3);
 % A is obtained by Cholesky factorization from the equation AA^T = (M^T w M)^???1
+
+
 A = chol(inv(M' * w * M));
 % Homography to upgrade the affine reconstruction to a metric reconstruction
 Ha = [inv(A), [0, 0, 0]'; 0, 0, 0, 1];
@@ -474,6 +484,57 @@ Ncam = length(I);
 % ToDo: show the data points (image correspondences) and the projected
 % points (of the reconstructed 3D points) in images 1 and 2. Reuse the code
 % in section 'Check projected points' (synthetic experiment).
+
+%Compute sift keypoints and matches.
+points = cell(2,1);
+descriptors = cell(2,1);
+% for i = 1:Ncam
+%     [points{i}, descriptors{i}] = sift(I{i}, 'Threshold', 0.01);
+%     points{i} = points{i}(1:2,:);
+% end
+
+% matches = siftmatch(descriptors{1}, descriptors{2});
+% Plot matches.
+figure();
+plotmatches(I{1}, I{2}, points{1}, points{2}, matches, 'Stacking', 'v');
+
+x1 = points{1}(:,matches(1,:));
+x2 = points{2}(:,matches(2,:));
+[F, inliers] = ransac_fundamental_matrix(homog(x1), homog(x2), 2);
+
+% Plot inliers.
+inlier_matches = matches(:, inliers);
+figure;
+plotmatches(I{1}, I{2}, points{1}, points{2}, inlier_matches, 'Stacking', 'v');
+
+x1 = points{1}(:, inlier_matches(1, :));
+x2 = points{2}(:, inlier_matches(2, :));
+
+x1 = homog(x1);
+x2 = homog(x2);
+
+[Pproj, Xproj] = factorization_method({x1, x2});
+% Check projected points (estimated and data points)
+for i=1:2
+    x_proj{i} = euclid(Pproj(3*i-2:3*i, :)*Xproj);
+end
+x_d{1} = euclid(P1*Xh);
+x_d{2} = euclid(P2*Xh);
+
+% image 1
+figure;
+hold on
+imshow(I{1})
+plot(x_d{1}(1,:),x_d{1}(2,:),'r*');
+plot(x_proj{1}(1,:),x_proj{1}(2,:),'bo');
+axis equal
+
+% image 2
+figure;
+hold on
+imshow(I{2})
+plot(x_d{2}(1,:),x_d{2}(2,:),'r*');
+plot(x_proj{2}(1,:),x_proj{2}(2,:),'bo');
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% 5. Affine reconstruction (real data)
