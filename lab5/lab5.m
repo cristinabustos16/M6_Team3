@@ -459,9 +459,12 @@ plot3([X5(1) X6(1)], [X5(2) X6(2)], [X5(3) X6(3)]);
 plot3([X7(1) X8(1)], [X7(2) X8(2)], [X7(3) X8(3)]);
 plot3([X5(1) X7(1)], [X5(2) X7(2)], [X5(3) X7(3)]);
 plot3([X6(1) X8(1)], [X6(2) X8(2)], [X6(3) X8(3)]);
-axis vis3d
-axis equal
+% axis vis3d
+% axis equal
 
+% ae = [linspace(-45, 45, 100); linspace(0, 180, 100)];
+% for i=1:size(ae,2),
+% view(ae(1,i), ae(2,i)); title(sprintf('%d / %d', ae(:,i))); pause(.1); end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% 4. Projective reconstruction (real data)
@@ -560,7 +563,7 @@ acceleration = 0;
 focal_ratio = 1;
 params.PRINT = 1;
 params.PLOT = 1;
-[horizon1, VPs1] = detect_vps(img_in, folder_out, manhattan, acceleration, focal_ratio, params);
+[horizon1, VPs1] = detect_vps(img_in1, folder_out, manhattan, acceleration, focal_ratio, params);
 
 img_in2 =  'Data/0001_s.png'; % input image
 [horizon2, VPs2] = detect_vps(img_in2, folder_out, manhattan, acceleration, focal_ratio, params);
