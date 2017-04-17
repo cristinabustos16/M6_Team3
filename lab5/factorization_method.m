@@ -31,20 +31,31 @@ function [Pproj, Xproj] = factorization_method(x)
     end
 
     % 3. Initialize all lambda_ij (= 1 or better initialization).
-    % Note: initialiing to 1 it does not work!
+
     lambda = ones(Ncams, Npoints);
-    for idx = 1:size(x, 2)
-        F{idx} = fundamental_matrix(x{idx}, x{1});
-        [U, D, V] = svd(F{idx});
-        e{idx} = V(:,3) / V(3,3);
+
+    % Sturm initialization (NOTE: initialiing to 1 does not work!)
+    
+    % camera 1
+    F1 = fundamental_matrix(x{1}, x{1});
+    [U, D, V] = svd(F1);
+    e1 = V(:,3) / V(3,3);
+        
+    % camera 2
+    F2 = fundamental_matrix(x{2}, x{1});
+    [U, D, V] = svd(F2);
+    e2 = V(:,3) / V(3,3);
+        
+    for j=1:size(x{1},2)
+        num = x{1}(:, j)' * F1 * cross(e1, x{1}(:,j));
+        denom = norm(cross(e1, x{1}(:,j))) .^ 2 * lambda(1, j);
+        lambda(1,j) = num / denom;
     end
-    for i = 1:size(x, 2)
-        for j = 1:size(x{1},2)
-            num = x{1}(:, j)'*F{i}*cross(e{i}, x{i}(:,j));
-            denom = norm(cross(e{i}, x{i}(:,j))).^2*lambda(1, j);
-            lambda(i,j) = num/denom;
-        end
-    end   
+    for j=1:size(x{2},2)
+        num = x{1}(:, j)' * F2 * cross(e2, x{2}(:,j));
+        denom = norm(cross(e2, x{2}(:,j))) .^ 2 * lambda(1, j);
+        lambda(2,j) = num / denom;
+    end
 
     % Initialize mean distance between original and projected 2D poitns:
     d = Inf;
