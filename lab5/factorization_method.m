@@ -23,14 +23,14 @@ function [Pproj, Xproj] = factorization_method(x)
     Ncams = length(x);
     Npoints = size(x{1},2);
 
-    % Normalize points:
+    % 2. Normalize the set of points in each image (similarity transf. Hs).
     x_hat = cell(1,Ncams);
     Harray = cell(1,Ncams);
     for i = 1:Ncams
         [x_hat{i}, Harray{i}] = normalise2dpts(x{i});
     end
 
-    % Initialize lambdas:
+    % 3. Initialize all lambda_ij (= 1 or better initialization).
     % Note: initialiing to 1 it does not work!
     lambda = ones(Ncams, Npoints);
     for idx = 1:size(x, 2)
@@ -52,6 +52,10 @@ function [Pproj, Xproj] = factorization_method(x)
     % Loop.
     iterate = 1;
     while(iterate)
+
+        % 4. Alternate rescaling the rows of the depth matrix (formed by lambda_ij)
+        % to have unit norm and the columns of depth matrix to have unit norm until
+        % depth matrix stops changing significantly (usually two loops).
         % Reescale matrix lambda:
         reescale = 1;
         while(reescale)
@@ -70,7 +74,7 @@ function [Pproj, Xproj] = factorization_method(x)
             end
         end
             
-        % Build measurement matrix:
+        % 5. Build the measurement matrix M
         M = zeros(3*Ncams, Npoints);
         for i = 1:Ncams
             M(3*i-2,:) = lambda(i,:) .* x_hat{i}(1,:);
@@ -78,13 +82,16 @@ function [Pproj, Xproj] = factorization_method(x)
             M(3*i,:)   = lambda(i,:) .* x_hat{i}(3,:);
         end
         
-        % Singular Value Decomposition of M:
+        % 6. Determine the SVD of M = UDVT
         [U,D,V] = svd(M);
         
+        % 7. Let PM = UD4 and XM =V4T
         % Camera projection matrices and homogenous 3D points:
         Pproj_hat = U * D(:,1:4);
         Xproj = V(:,1:4)';
         
+        % 8. If sum_i sum_j d(xji , P^i X_j)2 converges then stop; 
+        % Otherwise let lambda_ij = (P^iX_j)_3 and go to Step 4.
         % Compute distance between original 2D points and projected ones:
         d_old = d;
         d = 0;
@@ -106,7 +113,7 @@ function [Pproj, Xproj] = factorization_method(x)
         end
     end
     
-    % Unnormalize:
+    % 9. Unnormalize the camera matrices
     for i = 1:Ncams
         Pproj((3*i-2):(3*i),:) = inv(Harray{i}) * Pproj_hat((3*i-2):(3*i),:);
     end
