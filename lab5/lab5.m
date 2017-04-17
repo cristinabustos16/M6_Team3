@@ -611,20 +611,21 @@ v1 = homog(VPs1(:,1));
 v2 = homog(VPs1(:,2));
 v3 = homog(VPs1(:,3));
 
-% note: notation xxa, a added to differentiate matrix elements from vanishing points
-u1a = v1(1); u2a = v1(2); u3a = v1(3);
-v1a = v2(1); v2a = v2(2); v3a = v2(3);
-z1a = v3(1); z2a = v3(2); z3a = v3(3);
+A = [v1(1)*v2(1) v1(1)*v2(2) + v1(2)*v2(1) v1(1)*v2(3) + v1(3)*v2(1) v1(2)*v2(2) v1(2)*v2(3) + v1(3)*v2(2) v1(3)*v2(3);
+     v1(1)*v3(1) v1(1)*v3(2) + v1(2)*v3(1) v1(1)*v3(3) + v1(3)*v3(1) v1(2)*v3(2) v1(2)*v3(3) + v1(3)*v3(2) v1(3)*v3(3);
+     v2(1)*v3(1) v2(1)*v3(2) + v2(2)*v3(1) v2(1)*v3(3) + v2(3)*v3(1) v2(2)*v3(2) v2(2)*v3(3) + v2(3)*v3(2) v2(3)*v3(3);
+     0           1             0                         0           0           0;
+     1           0             0                         -1          0           0];
 
-A = [ u1a*v1a u1a*v2a+u2a*v1a u1a*v3a+u3a*v1a u2a*v2a u2a*v3a+u3a*v2a u3a*v3a; ...
-      u1a*z1a u1a*z2a+u2a*z1a u1a*z3a+u3a*z1a u2a*z2a u2a*z3a+u3a*z2a u3a*z3a; ...
-      v1a*z1a v1a*z2a+v2a*z1a v1a*z3a+v3a*z1a v2a*z2a v2a*z3a+v3a*z2a v3a*z3a; ...
-      0       1               0               0       0               0; ...
-      1       0               0               -1      0               0 ];
-  
-wv = null(A);
-wv = wv(:,end);
+% book 496: Algorithm 19.2 comes down to solving a homogeneous set of equations
+% of the form Ac = 0, where c represents w arranged as a 6-vector.
+% In matrix form: A??V = 0, where ??V = (??11,??12,??13,??22,??23,??33)T
 
+% lpmayos: The solution ??_V is the null vector of A (slides 9a slide 35).
+[U, D, V] = svd(A);
+wv = V(:,end);
+
+% lpmayos: slides 9a slide 34
 omega = [ wv(1) wv(2) wv(3); ...
           wv(2) wv(4) wv(5); ...
           wv(3) wv(5) wv(6) ];
@@ -634,18 +635,22 @@ omega = [ wv(1) wv(2) wv(3); ...
 % val(val<0)=eps;
 % w=vec*val*vec';
 
+% the camera is known to have zero skew, then w12 = 0
+% pixels are square, that is, zero skew and alpha_x = alpha_y , then: w11 = w22
+% w = [ wv(2,2) 0       wv(1,3); ...
+%       0       wv(2,2) wv(2,3); ...
+%       wv(1,3) wv(2,3) wv(3,3) ];
+
 % book alpg. 10.1 page pdf 295
 % camera in the affine reconstruction for which w is computed
 p1_a = p1 * inv(Hp);
-
 % p1_a = p1 * Hp;
 % M is the first 3 ?? 3 submatrix
-
 M = p1_a(1:3, 1:3);
-
 % A is obtained by Cholesky factorization from the equation AA^T = (M^T w M)^???1
-A = chol(inv(M' * omega * M));
 
+
+A = chol(inv(M' * omega * M));
 % Homography to upgrade the affine reconstruction to a metric reconstruction
 Ha = [inv(A), [0, 0, 0]'; 0, 0, 0, 1];
 
