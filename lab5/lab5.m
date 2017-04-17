@@ -394,10 +394,10 @@ A = [ u1a*v1a u1a*v2a+u2a*v1a u1a*v3a+u3a*v1a u2a*v2a u2a*v3a+u3a*v2a u3a*v3a; .
 
 % lpmayos: The solution ??_V is the null vector of A (slides 9a slide 35).
 wv = null(A);
-wv = wv(:,3);
+wv = wv(:,end);
 
 % lpmayos: slides 9a slide 34
-w = [ wv(1) wv(2) wv(3); ...
+omega = [ wv(1) wv(2) wv(3); ...
       wv(2) wv(4) wv(5); ...
       wv(3) wv(5) wv(6) ];
 
@@ -421,7 +421,7 @@ M = p1_a(1:3, 1:3);
 % A is obtained by Cholesky factorization from the equation AA^T = (M^T w M)^???1
 
 
-A = chol(inv(M' * w * M));
+A = chol(inv(M' * omega * M));
 % Homography to upgrade the affine reconstruction to a metric reconstruction
 Ha = [inv(A), [0, 0, 0]'; 0, 0, 0, 1];
 
@@ -485,15 +485,15 @@ Ncam = length(I);
 % points (of the reconstructed 3D points) in images 1 and 2. Reuse the code
 % in section 'Check projected points' (synthetic experiment).
 
-%Compute sift keypoints and matches.
+% Compute sift keypoints and matches.
 points = cell(2,1);
 descriptors = cell(2,1);
-% for i = 1:Ncam
-%     [points{i}, descriptors{i}] = sift(I{i}, 'Threshold', 0.01);
-%     points{i} = points{i}(1:2,:);
-% end
+for i = 1:Ncam
+    [points{i}, descriptors{i}] = sift(I{i}, 'Threshold', 0.01);
+    points{i} = points{i}(1:2,:);
+end
 
-% matches = siftmatch(descriptors{1}, descriptors{2});
+matches = siftmatch(descriptors{1}, descriptors{2});
 % Plot matches.
 figure();
 plotmatches(I{1}, I{2}, points{1}, points{2}, matches, 'Stacking', 'v');
@@ -524,7 +524,6 @@ x_d{2} = euclid(P2*Xh);
 % image 1
 figure;
 hold on
-imshow(I{1})
 plot(x_d{1}(1,:),x_d{1}(2,:),'r*');
 plot(x_proj{1}(1,:),x_proj{1}(2,:),'bo');
 axis equal
@@ -532,10 +531,19 @@ axis equal
 % image 2
 figure;
 hold on
-imshow(I{2})
 plot(x_d{2}(1,:),x_d{2}(2,:),'r*');
 plot(x_proj{2}(1,:),x_proj{2}(2,:),'bo');
 
+%3D visualisation
+% X(1,:) = Xproj(1,:)./Xproj(4,:);
+% X(2,:) = Xproj(2,:)./Xproj(4,:);
+% X(3,:) = Xproj(3,:)./Xproj(4,:);
+% figure; hold on;
+% for i = 1:length(X)
+%     scatter3(X(1,i), X(2,i), X(3,i), 15, [0.2 0.9 0.4], 'filled');
+% end;
+% axis([-200 200 -200 200 -200 200]);
+% axis vis3d;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% 5. Affine reconstruction (real data)
 
@@ -549,20 +557,40 @@ plot(x_proj{2}(1,:),x_proj{2}(2,:),'bo');
 % This is an example on how to obtain the vanishing points (VPs) from three
 % orthogonal lines in image 1
 
-img_in =  'Data/0000_s.png'; % input image
+img_in1 =  'Data/0000_s.png'; % input image
 folder_out = '.'; % output folder
 manhattan = 1;
 acceleration = 0;
 focal_ratio = 1;
 params.PRINT = 1;
 params.PLOT = 1;
-[horizon, VPs] = detect_vps(img_in, folder_out, manhattan, acceleration, focal_ratio, params);
+[horizon1, VPs1] = detect_vps(img_in, folder_out, manhattan, acceleration, focal_ratio, params);
+
+img_in2 =  'Data/0001_s.png'; % input image
+[horizon2, VPs2] = detect_vps(img_in2, folder_out, manhattan, acceleration, focal_ratio, params);
+
+p1 = Pproj(1:3,:);  % camera 1
+p2 = Pproj(4:6,:);  % camera 2
+
+[w,h] = size(I{1});
+
+A = [triangulate(VPs1(:,1), VPs2(:,1), p1, p2, [w h])'; ...
+     triangulate(VPs1(:,2), VPs2(:,2), p1, p2, [w h])'; ...
+     triangulate(VPs1(:,3), VPs2(:,3), p1, p2, [w h])'];
+
+rightNullSpace = null(A);  % Z = null(A) is an orthonormal basis for the null space of A obtained from the singular value decomposition.
+H = [euclid(rightNullSpace)' 1];  % we could just divide each element by H(4)
+% equivalent to [U, D, V] = svd(A); H = V(:, end);
+Hp = eye(4);
+Hp(end,:) = H;
 
 
 %% Visualize the result
 
 % x1m are the data points in image 1
 % Xm are the reconstructed 3D points (projective reconstruction)
+x1m = euclid(x1);
+Xm = Xproj;
 
 r = interp2(double(Irgb{1}(:,:,1)), x1m(1,:), x1m(2,:));
 g = interp2(double(Irgb{1}(:,:,2)), x1m(1,:), x1m(2,:));
@@ -580,7 +608,63 @@ axis equal;
 
 % ToDo: compute the matrix Ha that updates the affine reconstruction
 % to a metric one and visualize the result in 3D as in the previous section
+v1 = homog(VPs1(:,1));
+v2 = homog(VPs1(:,2));
+v3 = homog(VPs1(:,3));
 
+% note: notation xxa, a added to differentiate matrix elements from vanishing points
+u1a = v1(1); u2a = v1(2); u3a = v1(3);
+v1a = v2(1); v2a = v2(2); v3a = v2(3);
+z1a = v3(1); z2a = v3(2); z3a = v3(3);
+
+A = [ u1a*v1a u1a*v2a+u2a*v1a u1a*v3a+u3a*v1a u2a*v2a u2a*v3a+u3a*v2a u3a*v3a; ...
+      u1a*z1a u1a*z2a+u2a*z1a u1a*z3a+u3a*z1a u2a*z2a u2a*z3a+u3a*z2a u3a*z3a; ...
+      v1a*z1a v1a*z2a+v2a*z1a v1a*z3a+v3a*z1a v2a*z2a v2a*z3a+v3a*z2a v3a*z3a; ...
+      0       1               0               0       0               0; ...
+      1       0               0               -1      0               0 ];
+  
+wv = null(A);
+wv = wv(:,end);
+
+omega = [ wv(1) wv(2) wv(3); ...
+          wv(2) wv(4) wv(5); ...
+          wv(3) wv(5) wv(6) ];
+
+% forcing w to be positive definite  
+% [vec,val]=eig(w);
+% val(val<0)=eps;
+% w=vec*val*vec';
+
+% book alpg. 10.1 page pdf 295
+% camera in the affine reconstruction for which w is computed
+p1_a = p1 * inv(Hp);
+
+% p1_a = p1 * Hp;
+% M is the first 3 ?? 3 submatrix
+
+M = p1_a(1:3, 1:3);
+
+% A is obtained by Cholesky factorization from the equation AA^T = (M^T w M)^???1
+A = chol(inv(M' * omega * M));
+
+% Homography to upgrade the affine reconstruction to a metric reconstruction
+Ha = [inv(A), [0, 0, 0]'; 0, 0, 0, 1];
+
+%% Visualize the result
+
+% x1m are the data points in image 1
+% Xm are the reconstructed 3D points (projective reconstruction)
+
+r = interp2(double(Irgb{1}(:,:,1)), x1m(1,:), x1m(2,:));
+g = interp2(double(Irgb{1}(:,:,2)), x1m(1,:), x1m(2,:));
+b = interp2(double(Irgb{1}(:,:,3)), x1m(1,:), x1m(2,:));
+Xe = euclid(Ha*Hp*Xm);
+figure; hold on;
+[w,h] = size(I{1});
+for i = 1:length(Xe)
+    scatter3(Xe(1,i), Xe(2,i), Xe(3,i), 2^2, [r(i) g(i) b(i)], 'filled');
+end;
+axis equal;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% 7. OPTIONAL: Projective reconstruction from two views
 
